@@ -1,0 +1,32 @@
+{
+  "name": "alsharev1",
+  "version": "1.0.0",
+  "description": "relation databse  (mysql )",
+  "main": "main.js",
+  "scripts": {
+    "start": "nodemon main.js",
+    "create_development_migration": "knex migrate:make --env development --migrations-directory db/migrations",
+    "development_migrate": "knex migrate:latest --env development --knexfile db/knex.js",
+    "production_migrate": "knex migrate:latest --env production --knexfile db/knex.js",
+    "staging_migrate": "knex migrate:latest --env staging --knexfile db/knex.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-promise-router": "^4.1.1",
+    "fast-two-sms": "^3.0.0",
+    "knex": "^3.0.1",
+    "moment": "^2.29.4",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.6.3",
+    "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.1",
+    "objection": "^3.1.2",
+    "razorpay": "^2.9.2"
+  }
+}

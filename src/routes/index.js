@@ -1,8 +1,9 @@
 const user = require("../routes/users/index")
-
-
-
-
-module.exports ={
-    user  
-}
+const event = require("../routes/events/index")
+const followersFollowing = require("../routes/follower_following/index")
+module.exports =[
+    user,
+    event,
+    followersFollowing
+]
+      

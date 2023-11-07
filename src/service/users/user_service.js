@@ -1,5 +1,4 @@
 const userRepository = require("../../repository/users/user_repository")
-
 const RegisteredUser = async (data) => {
     let err, result
     try {
@@ -12,8 +11,6 @@ const RegisteredUser = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-
-
 
 module.exports = {
     RegisteredUser

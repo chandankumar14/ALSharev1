@@ -13,7 +13,7 @@ class Event extends Model {
                 modelClass: users,
                 join: {
                     from: 'events.userId',
-                    to: 'user.userId'
+                    to: 'users.userId'
                 }
             },
             // this is for participants details 

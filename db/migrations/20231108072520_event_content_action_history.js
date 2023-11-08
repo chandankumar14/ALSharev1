@@ -3,26 +3,24 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-    return knex.schema.createTable("transactions", table => {
-        table.increments("id").primary()
+    return knex.schema.createTable("event_content_action", table => {
+        table.increments("actionId").primary()
         table.integer("userId")
             .unsigned()
             .notNullable()
             .references("userId")
             .inTable("users")
+        table.integer("contentId")
         table.integer("eventId")
             .unsigned()
+            .nullable()
             .references("eventId")
             .inTable("events")
-        table.float("amount")
-        table.string("orderId") // this is representing the razorpay orderId
-        table.string("keyId") // this is razorpay keyId
-        table.boolean("initiated").defaultTo(true)
-        table.string("transId")
-        table.string("payment_mode")
-        table.boolean("status").defaultTo(false)
-        table.string("currency_code")
-        table.json("paymentResponse")
+        table.integer("typeId")
+        table.string("name")
+        table.string("value")
+        table.float("rating")
+       table.boolean("active").defaultTo(true)
         table.timestamp("created_at").notNullable().defaultTo(knex.fn.now())
         table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now())
     })
@@ -33,5 +31,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-    return knex.schema.dropTable("transactions")
+    return knex.schema.dropTable("event_content_action")
 };

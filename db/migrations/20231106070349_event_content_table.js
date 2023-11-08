@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
     return knex.schema.createTable("event_content", table => {
-        table.increments("eventContentId").primary()
+        table.increments("contentId").primary()
         table.integer("userId")
             .unsigned()
             .notNullable()
@@ -15,8 +15,8 @@ exports.up = function (knex) {
             .notNullable()
             .references("eventId")
             .inTable("events")
-        table.string("title", 10, 100)
-        table.string("description", 100, 1000)
+        table.string("title")
+        table.string("description")
         table.string("originalSourcePath")
         table.string("customSourcePath")
         table.string("contentSource")
@@ -24,6 +24,8 @@ exports.up = function (knex) {
         table.string("thumbnail")
         table.string("duration")
         table.string("rating")
+        table.boolean("status")
+        table.boolean("delete").defaultTo(false)
         table.integer("userCount") // total no of user who has given rating 
         table.timestamp("created_at").notNullable().defaultTo(knex.fn.now())
         table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now())

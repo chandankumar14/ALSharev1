@@ -1,4 +1,4 @@
-const followersFollowingRepository = require("../../repository/followers_following/followers_following")
+const followersFollowingRepository = require("../../repository/followers_following/followers_following_repository")
 
 //*******follow user******* */
 const follow = async (data) => {

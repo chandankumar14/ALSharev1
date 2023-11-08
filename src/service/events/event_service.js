@@ -7,6 +7,7 @@ const createEvent = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -20,6 +21,7 @@ const postDraftevent = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -33,6 +35,7 @@ const draftEventListByUserId = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -47,6 +50,7 @@ const postedEventListByUserId = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -60,6 +64,7 @@ const AllPostedeventList = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)

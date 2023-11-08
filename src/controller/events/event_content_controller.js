@@ -103,6 +103,39 @@ const eventContentList = async (req, res) => {
     }
 }
 
+const eventContentRating = async (req, res) => {
+    let result, data
+    data = req.body
+    try {
+        [err, result] = await to(eventContentService.eventContentRating(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "Your rating is saved ....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+const eventContentAction = async (req, res) => {
+    let result, data
+    data = req.body
+    try {
+        [err, result] = await to(eventContentService.eventContentAction(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "Your reaction is saved ....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 
 module.exports = {
     postEventContent,
@@ -110,5 +143,7 @@ module.exports = {
     postDraftEventContent,
     userDfratEventContent,
     userPostedEventContent,
-    eventContentList
+    eventContentList,
+    eventContentRating,
+    eventContentAction
 }

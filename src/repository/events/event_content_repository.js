@@ -1,5 +1,6 @@
 const eventContentModel = require("../../models/events/event_content")
 const eventContentActionModel = require("../../models/events/event_content_action")
+const eventContentRatingModel = require("../../models/events/event_content_rating")
 //posting this event content 
 const postEventContent = async (data) => {
     try {
@@ -99,6 +100,12 @@ const userPostedEventContent = async (data) => {
 const eventContentRating = async (data) => {
     try {
         let err, result1, result2, result3
+        const payload = {
+            contentId: data.contentId,
+            rating: data.current,
+            userId: data.userId,
+            active: true
+        }
         const finalValue = Number(parseFloat(((data.rating * data.userCount) + (last - current)) / data.userCount).toFixed(2))
         // ***********event content rating seaction *********
         [err, result1] = await to(eventContentModel.query().update({ rating: finalValue, userCount: userCount })
@@ -106,23 +113,60 @@ const eventContentRating = async (data) => {
         if (err) {
             throw ErrorResponse(err.message)
         }
-        [err, result2] = await to(eventContentActionModel.query().update({ active: false }).where({ "actionId": data.actionId }))
-        if (err) {
-            throw ErrorResponse(err.message)
+        if (data.firstTime) {
+            [err, result2] = await to(eventContentRatingModel.query().insert(payload))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+            return result2
+        } else {
+            [err, result2] = await to(eventContentRatingModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+
+            [err, result3] = await to(await to(eventContentRatingModel.query().insert(payload)))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+            return result3
         }
 
-        [err, result3] = await to(eventContentActionModel.query().insert(
-            {
-                userId: data.userId,
-                contentId: data.contentId,
-                eventId: data.eventId,
-                rating: data.current
-            }
-        ))
-        if (err) {
-            throw ErrorResponse(err.message)
+
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+const eventContentAction = async(data)=>{
+    try {
+        let err, result2, result3
+        const payload = {
+            userId: data.contentId,
+            contentId: data.current,
+            eventId: data.userId,
+            typeId:data.typeId,
+            name:data.name,
+            value:data.value,
         }
-        return result3
+       if (data.firstTime) {
+            [err, result2] = await to(eventContentActionModel.query().insert(payload))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+            return result2
+        } else {
+            [err, result2] = await to(eventContentActionModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+
+            [err, result3] = await to(await to(eventContentActionModel.query().insert(payload)))
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+            return result3
+        }
+    
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -134,5 +178,6 @@ module.exports = {
     eventContentList,
     userDfratEventContent,
     userPostedEventContent,
-    eventContentRating
+    eventContentRating,
+    eventContentAction
 }

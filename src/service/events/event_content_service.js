@@ -84,11 +84,41 @@ const eventContentList = async (data) => {
     }
 }
 
+const eventContentRating = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(eventContentRepository.eventContentRating(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const eventContentAction = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(eventContentRepository.eventContentAction(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postEventContent,
     postDraftEventContent,
     deleteEventContent,
     userDfratEventContent,
     userPostedEventContent,
-    eventContentList
+    eventContentList,
+    eventContentRating,
+    eventContentAction
 }

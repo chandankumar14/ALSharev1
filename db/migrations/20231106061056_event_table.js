@@ -17,6 +17,7 @@ exports.up = function (knex) {
         table.json("prize")
         table.float("entry_fee")
         table.boolean("event_status")
+        table.boolean("delete").defaultTo(false)
         table.timestamp("created_at").notNullable().defaultTo(knex.fn.now())
         table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now())
     })

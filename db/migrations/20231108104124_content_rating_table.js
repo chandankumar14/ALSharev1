@@ -16,7 +16,7 @@ exports.up = function (knex) {
             .references("contentId")
             .inTable("content")
         table.float("rating")
-        table.boolean("active")
+        table.boolean("active").defaultTo(true)
         table.timestamp("created_at").notNullable().defaultTo(knex.fn.now())
         table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now())
     })

@@ -15,6 +15,7 @@ exports.up = function (knex) {
         table.date("DOB")
         table.string("phone")
         table.string("password")
+        table.boolean("delete").defaultTo(false)
         table.string("deviceId") // to identify the user , 
         table.string("OTP") // to validate the otp verification process , this is in incrypted form 
         table.string("Gender")

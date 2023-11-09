@@ -4,15 +4,23 @@ class eventContent extends Model {
         return "event_content"
     }
     static get relationMappings() {
-        const users = require("../users/user")
+        const event_content_action = require("../events/event_content_action")
+        const event_content_rating = require("../events/event_content_rating")
         return {
-            // this is for event owner details 
-            content_owner: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: users,
+            action: {
+                relation: Model.HasManyRelation,
+                modelClass: event_content_action,
                 join: {
-                    from: 'event_content.userId',
-                    to: 'users.userId'
+                    from: 'event_content.contentId',
+                    to: 'event_content_action.contentId'
+                }
+            },
+            rating: {
+                relation: Model.HasManyRelation,
+                modelClass: event_content_rating,
+                join: {
+                    from: 'event_content.contentId',
+                    to: 'event_content_rating.contentId'
                 }
             },
         }

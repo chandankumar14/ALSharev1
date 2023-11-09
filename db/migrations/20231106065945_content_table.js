@@ -21,6 +21,7 @@ exports.up = function (knex) {
       table.string("thumbnail")
       table.string("duration")
       table.float("rating")
+      table.boolean("delete").defaultTo(false)
       table.integer("userCount") // total no of user who has given rating 
       table.timestamp("created_at").notNullable().defaultTo(knex.fn.now())
       table.timestamp("updated_at").notNullable().defaultTo(knex.fn.now())

@@ -84,8 +84,6 @@ const AllPostedeventList = async (data) => {
     }
 }
 
-
-
 module.exports = {
     createEvent,
     postDraftevent,

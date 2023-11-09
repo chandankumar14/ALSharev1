@@ -19,7 +19,7 @@ const postDraftEventContent = async (data) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().update({ "status": true })
-            .where({ "userId": data.userId }))
+            .where({ "contentId": data.userId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -33,7 +33,7 @@ const deleteEventContent = async (data) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().update({ "delete": true })
-            .where({ "eventContentId": data.eventContentId }))
+            .where({ "contentId": data.contentId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -47,8 +47,11 @@ const eventContentList = async (data) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .eager('[content_owner]')
-            .modifyEager('content_owner', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .eager('[action,rating]')
+            .modifyEager('action', (builder) => builder.select("*")
+                .where({ "active": true }))
+            .modifyEager("rating", (builder) => builder.select("*")
+                .where({ "active": true }))
             .where({ "eventId": data.eventId })
             .where({ "status": true })
             .where({ "delete": false }))
@@ -137,18 +140,18 @@ const eventContentRating = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-const eventContentAction = async(data)=>{
+const eventContentAction = async (data) => {
     try {
         let err, result2, result3
         const payload = {
             userId: data.contentId,
             contentId: data.current,
             eventId: data.userId,
-            typeId:data.typeId,
-            name:data.name,
-            value:data.value,
+            typeId: data.typeId,
+            name: data.name,
+            value: data.value,
         }
-       if (data.firstTime) {
+        if (data.firstTime) {
             [err, result2] = await to(eventContentActionModel.query().insert(payload))
             if (err) {
                 throw ErrorResponse(err.message)
@@ -166,7 +169,7 @@ const eventContentAction = async(data)=>{
             }
             return result3
         }
-    
+
     } catch (err) {
         throw ErrorResponse(err.message)
     }

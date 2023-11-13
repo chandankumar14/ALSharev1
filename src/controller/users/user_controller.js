@@ -1,10 +1,10 @@
 const userService = require("../../service/users/user_service")
 
-const RegisteredUser = async (req, res) => {
+const user_singIn_signUp = async (req, res) => {
     let result, data
     data = req.body
     try {
-        [err, result] = await to(userService.RegisteredUser(data))
+        [err, result] = await to(userService.user_singIn_signUp(data))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -19,5 +19,5 @@ const RegisteredUser = async (req, res) => {
 
 
 module.exports = {
-    RegisteredUser
+    user_singIn_signUp
 }

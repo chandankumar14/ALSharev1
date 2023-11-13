@@ -104,10 +104,10 @@ async function SendOtpToEmail(Email) {
             </div>`
   };
   const Result = await transporter.sendMail(mailOptions)
-  if (Result && Result != undefined  && encrypt_pass && encrypt_pass!=undefined) {
+  if (Result && Result != undefined && encrypt_pass && encrypt_pass != undefined) {
     return {
-      encrypt_pass:encrypt_pass,
-      User_Name: User_Name
+      OTP: encrypt_pass,
+      firstName: User_Name
     }
   }
 }

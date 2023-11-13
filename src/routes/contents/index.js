@@ -1,7 +1,6 @@
 const promiseRouter = require('express-promise-router');
 const Router = promiseRouter();
 const contentController = require("../../controller/index").contentController
-
 Router.post(`/post_content`, contentController.postContent)
 Router.post(`/post_draft_content`, contentController.postDraftcontent)
 Router.post(`/user_posted_content_list`, contentController.userPostedContentList)

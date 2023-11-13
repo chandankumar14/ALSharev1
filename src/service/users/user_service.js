@@ -1,8 +1,8 @@
 const userRepository = require("../../repository/users/user_repository")
-const RegisteredUser = async (data) => {
+const user_singIn_signUp = async (data) => {
     let err, result
     try {
-        [err, result] = await to(userRepository.RegisteredUser(data))
+        [err, result] = await to(userRepository.user_singIn_signUp(data))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -13,5 +13,5 @@ const RegisteredUser = async (data) => {
 }
 
 module.exports = {
-    RegisteredUser
+    user_singIn_signUp
 }

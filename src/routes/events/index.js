@@ -10,7 +10,7 @@ Router.post(`/create_event`, authMiddleware, eventController.createEvent);
 Router.get(`/post_draft_event/:eventId`, authMiddleware, eventController.postDraftevent)
 Router.get(`/posted_event_list_by_userId/:userId`, authMiddleware, eventController.postedEventListByUserId)
 Router.get(`/draft_event_list/:userId`, authMiddleware, eventController.draftEventListByUserId)
-Router.get(`/all_posted_event_list`, eventController.AllPostedeventList)
+Router.get(`/all_posted_event_list`,authMiddleware, eventController.AllPostedeventList)
 
 //*********event content Routing here********** */
 Router.post(`/post_event_content`, authMiddleware, eventContentcontroller.postEventContent)

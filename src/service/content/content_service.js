@@ -14,10 +14,10 @@ const postContent = async (data) => {
     }
 }
 
-const postDraftcontent = async (data) => {
+const postDraftcontent = async (contentId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.postDraftcontent(data))
+        [err, result] = await to(contentRepository.postDraftcontent(contentId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -28,10 +28,10 @@ const postDraftcontent = async (data) => {
     }
 }
 
-const userDraftContentList = async (data) => {
+const userDraftContentList = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.userDraftContentList(data))
+        [err, result] = await to(contentRepository.userDraftContentList(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -42,10 +42,10 @@ const userDraftContentList = async (data) => {
     }
 }
 
-const userPostedContentList = async (data) => {
+const userPostedContentList = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.userPostedContentList(data))
+        [err, result] = await to(contentRepository.userPostedContentList(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -56,10 +56,10 @@ const userPostedContentList = async (data) => {
     }
 }
 
-const deletePostedContent = async (data) => {
+const deletePostedContent = async (contentId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.deletePostedContent(data))
+        [err, result] = await to(contentRepository.deletePostedContent(contentId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -70,10 +70,10 @@ const deletePostedContent = async (data) => {
     }
 }
 
-const postedContentList = async (data) => {
+const postedContentList = async () => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.postedContentList(data))
+        [err, result] = await to(contentRepository.postedContentList())
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

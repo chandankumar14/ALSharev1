@@ -21,10 +21,10 @@ const createEvent = async (req, res) => {
 //**************posting draft event************ */
 
 const postDraftevent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let eventId= req.params.eventId;
     try {
-        [err, result] = await to(eventService.postDraftevent(data))
+        [err, result] = await to(eventService.postDraftevent(eventId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -38,10 +38,10 @@ const postDraftevent = async (req, res) => {
 }
 
 const draftEventListByUserId = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let userId  = req.params.userId
     try {
-        [err, result] = await to(eventService.draftEventListByUserId(data))
+        [err, result] = await to(eventService.draftEventListByUserId(userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -55,10 +55,10 @@ const draftEventListByUserId = async (req, res) => {
 }
 
 const postedEventListByUserId = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let userId = req.params.userId;
     try {
-        [err, result] = await to(eventService.postedEventListByUserId(data))
+        [err, result] = await to(eventService.postedEventListByUserId(userId))
         if (err) {
             throw badRequestError(err.message)
         }

@@ -16,12 +16,11 @@ const postContent = async (data) => {
     }
 }
 //*************posting draft content ********** */
-const postDraftcontent = async (data) => {
+const postDraftcontent = async (contentId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ contentStatus: 1 })
-            .where({ "userId": data.userId })
-            .where({ "contentId": data.contentId }));
+           .where({ "contentId": contentId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -31,11 +30,11 @@ const postDraftcontent = async (data) => {
     }
 }
 //********* user draft content list ********* */
-const userDraftContentList = async (data) => {
+const userDraftContentList = async (userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
-            .where({ "userId": data.userId })
+            .where({ "userId": userId })
             .where({ "contentStatus": 0 })
             .where({ "delete": 0 }));
         if (err) {
@@ -47,11 +46,11 @@ const userDraftContentList = async (data) => {
     }
 }
 //******** user posted content list ********* */
-const userPostedContentList = async (data) => {
+const userPostedContentList = async (userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
-            .where({ "userId": data.userId })
+            .where({ "userId": userId })
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 }));
         if (err) {
@@ -64,12 +63,11 @@ const userPostedContentList = async (data) => {
 }
 
 // ******delete posted content **********
-const deletePostedContent = async (data) => {
+const deletePostedContent = async (contentId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ delete: 1 })
-            .where({ "userId": data.userId })
-            .where({ "contentId": data.contentId }));
+           .where({ "contentId": contentId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -80,7 +78,7 @@ const deletePostedContent = async (data) => {
 }
 
 // ********All posted content list ***********
-const postedContentList = async (data) => {
+const postedContentList = async () => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
@@ -107,7 +105,7 @@ const contentRating = async (data) => {
         let err, result1, result2, result3
         const payload = {
             contentId: data.contentId,
-            rating: data.rating,
+            rating: data.current,
             userId: data.userId,
             active: 1
         }

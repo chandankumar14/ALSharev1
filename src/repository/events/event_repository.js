@@ -15,11 +15,11 @@ const createEvent = async (data) => {
 }
 
 //*************posting draft event ********* */
-const postDraftevent = async (date) => {
+const postDraftevent = async (eventId) => {
     try {
         let err, result
         [err, result] = await to(eventModel.query().update({ "event_status": 1 })
-            .where({ "userId": date.userId }));
+            .where({ "eventId": eventId }));
 
         if (err) {
             throw ErrorResponse(err.message)
@@ -30,12 +30,12 @@ const postDraftevent = async (date) => {
     }
 }
 // *********** Fetching All Draft event of User ************
-const draftEventListByUserId = async (data) => {
+const draftEventListByUserId = async (userId) => {
     try {
         const Today_Date = moment().format();
         let err, result
         [err, result] = await to(eventModel.query().select("*")
-            .where({ "userId": data.userId })
+            .where({ "userId": userId })
             .where({ "event_status": 0 })
             .where("end_date", ">=", Today_Date))
 
@@ -48,12 +48,12 @@ const draftEventListByUserId = async (data) => {
     }
 }
 //********** Posted event List of user  */
-const postedEventListByUserId = async (data) => {
+const postedEventListByUserId = async (userId) => {
     try {
         const Today_Date = moment().format();
         let err, result
         [err, result] = await to(eventModel.query().select("*")
-            .where({ "userId": data.userId })
+            .where({ "userId": userId })
             .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))
         if (err) {

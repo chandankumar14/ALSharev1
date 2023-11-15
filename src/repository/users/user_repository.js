@@ -1,6 +1,8 @@
 const userModel = require("../../models/users/user")
 const common = require("../../../utilities/common")
 const msg = require("../../../utilities/msg")
+const jwt = require("jsonwebtoken");
+const secretOrKey = "ALShare@123$12"
 // **********Registered new User **********
 const user_singIn_signUp = async (data) => {
    const Email_Phone = data.Email_Phone ? data.Email_Phone : '';
@@ -70,7 +72,12 @@ const user_singIn_signUp = async (data) => {
             }
         }
         else {
-            msg.msg =`You are loggedIn successfully`
+            msg.msg = `You are loggedIn successfully`
+            const payload = {
+                userId: result[0].userId
+            }
+            const token = jwt.sign(payload, secretOrKey);
+            result[0]["token"] = `${token}`
             return result
         }
     } catch (err) {
@@ -161,14 +168,23 @@ const sendOTP = async (Email_Phone,deviceId) => {
 
 const OTPVerification = async (data) => {
     try {
-        let err, result
+        let err, result, result1
         const OTP = await common.EncryptPassword(data.OTP_code);
         [err, result] = await to(userModel.query().update({ OTP_Verification: 1 }).where({ "OTP": OTP }));
         msg.msg = `OTP verification has been completed `
         if (err) {
             throw ErrorResponse(err.message)
         }
-        return result
+        [err, result1] = await to(userModel.query().select("*").where({ "OTP": OTP }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        const payload = {
+            userId: result1[0].userId
+        }
+        const token = jwt.sign(payload, secretOrKey)
+        result1[0]["token"] = `${token}`
+        return result1
 
     } catch (err) {
         throw ErrorResponse(err.message)

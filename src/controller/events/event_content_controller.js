@@ -18,10 +18,10 @@ const postEventContent = async (req, res) => {
 }
 
 const deleteEventContent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let contentId = req.params.contentId
     try {
-        [err, result] = await to(eventContentService.deleteEventContent(data))
+        [err, result] = await to(eventContentService.deleteEventContent(contentId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -35,10 +35,10 @@ const deleteEventContent = async (req, res) => {
 }
 
 const postDraftEventContent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let contentId = req.params.contentId;
     try {
-        [err, result] = await to(eventContentService.postDraftEventContent(data))
+        [err, result] = await to(eventContentService.postDraftEventContent(contentId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -53,10 +53,10 @@ const postDraftEventContent = async (req, res) => {
 
 
 const userDfratEventContent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let userId = req.params.userId;
     try {
-        [err, result] = await to(eventContentService.userDfratEventContent(data))
+        [err, result] = await to(eventContentService.userDfratEventContent(userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -70,10 +70,10 @@ const userDfratEventContent = async (req, res) => {
 }
 
 const userPostedEventContent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let userId = req.params.userId;
     try {
-        [err, result] = await to(eventContentService.userPostedEventContent(data))
+        [err, result] = await to(eventContentService.userPostedEventContent(userId))
         if (err) {
             throw badRequestError(err.message)
         }

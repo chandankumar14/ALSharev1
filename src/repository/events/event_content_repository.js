@@ -15,11 +15,11 @@ const postEventContent = async (data) => {
     }
 }
 //*********Post draft event content ********* */
-const postDraftEventContent = async (data) => {
+const postDraftEventContent = async (contentId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentModel.query().update({ "status": true })
-            .where({ "contentId": data.userId }))
+        [err, result] = await to(eventContentModel.query().update({ "status": 1 })
+            .where({ "contentId": contentId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -29,11 +29,11 @@ const postDraftEventContent = async (data) => {
     }
 }
 //*************Deleting event content *********** */
-const deleteEventContent = async (data) => {
+const deleteEventContent = async (contentId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().update({ "delete": 1 })
-            .where({ "contentId": data.contentId }))
+            .where({ "contentId": contentId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -65,12 +65,11 @@ const eventContentList = async (data) => {
 }
 
 //**********user draft event content ************ */
-const userDfratEventContent = async (data) => {
+const userDfratEventContent = async (userId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .where({ "userId": data.userId })
-            .where({ "eventId": data.eventId })
+            .where({ "userId": userId })
             .where({ "status": 0 })
             .where({ "delete": 0 }))
         if (err) {
@@ -83,12 +82,11 @@ const userDfratEventContent = async (data) => {
 }
 
 //*********user event posted content ************ */
-const userPostedEventContent = async (data) => {
+const userPostedEventContent = async (userId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .where({ "userId": data.userId })
-            .where({ "eventId": data.eventId })
+            .where({ "userId": userId})
             .where({ "status": 1 })
             .where({ "delete": 0}))
         if (err) {
@@ -107,9 +105,9 @@ const eventContentRating = async (data) => {
             contentId: data.contentId,
             rating: data.current,
             userId: data.userId,
-            active: true
+            active: 1
         }
-        const finalValue = Number(parseFloat(((data.rating * data.userCount) + (last - current)) / data.userCount).toFixed(2))
+        const finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.last - data.current)) / data.userCount).toFixed(2))
         // ***********event content rating seaction *********
         [err, result1] = await to(eventContentModel.query().update({ rating: finalValue, userCount: userCount })
             .where({ "contentId": data.contentId }))
@@ -144,9 +142,9 @@ const eventContentAction = async (data) => {
     try {
         let err, result2, result3
         const payload = {
-            userId: data.contentId,
-            contentId: data.current,
-            eventId: data.userId,
+            userId: data.userId,
+            contentId: data.contentId,
+            eventId: data.eventId,
             typeId: data.typeId,
             name: data.name,
             value: data.value,

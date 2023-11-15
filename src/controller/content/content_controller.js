@@ -17,10 +17,10 @@ const postContent = async (req, res) => {
 }
 
 const postDraftcontent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result,err
+    let contentId = req.params.contentId;
     try {
-        [err, result] = await to(contentService.postDraftcontent(data))
+        [err, result] = await to(contentService.postDraftcontent(contentId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -35,10 +35,10 @@ const postDraftcontent = async (req, res) => {
 
 
 const userDraftContentList = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+   let userId = req.params.userId
     try {
-        [err, result] = await to(contentService.userDraftContentList(data))
+        [err, result] = await to(contentService.userDraftContentList(userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -52,10 +52,10 @@ const userDraftContentList = async (req, res) => {
 }
 
 const userPostedContentList = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+   let  userId = req.params.userId
     try {
-        [err, result] = await to(contentService.userPostedContentList(data))
+        [err, result] = await to(contentService.userPostedContentList(userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -69,10 +69,10 @@ const userPostedContentList = async (req, res) => {
 }
 
 const deletePostedContent = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let contentId = req.params.contentId
     try {
-        [err, result] = await to(contentService.deletePostedContent(data))
+        [err, result] = await to(contentService.deletePostedContent(contentId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -86,10 +86,9 @@ const deletePostedContent = async (req, res) => {
 }
 
 const postedContentList = async (req, res) => {
-    let result, data
-    data = req.body
-    try {
-        [err, result] = await to(contentService.postedContentList(data))
+    let result,err
+   try {
+        [err, result] = await to(contentService.postedContentList())
         if (err) {
             throw badRequestError(err.message)
         }

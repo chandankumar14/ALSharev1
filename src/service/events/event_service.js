@@ -14,10 +14,10 @@ const createEvent = async (data) => {
     }
 }
 // ********** posting draft event here ************
-const postDraftevent = async (data) => {
+const postDraftevent = async (eventId) => {
     try {
         let err, result
-        [err, result] = await to(eventRepository.postDraftevent(data))
+        [err, result] = await to(eventRepository.postDraftevent(eventId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -28,10 +28,10 @@ const postDraftevent = async (data) => {
     }
 }
 //************ user's draft event list here ********** */
-const draftEventListByUserId = async (data) => {
+const draftEventListByUserId = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(eventRepository.draftEventListByUserId(data))
+        [err, result] = await to(eventRepository.draftEventListByUserId(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -43,10 +43,10 @@ const draftEventListByUserId = async (data) => {
 }
 
 //****** user's posted evented list here ********** */
-const postedEventListByUserId = async (data) => {
+const postedEventListByUserId = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(eventRepository.postedEventListByUserId(data))
+        [err, result] = await to(eventRepository.postedEventListByUserId(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

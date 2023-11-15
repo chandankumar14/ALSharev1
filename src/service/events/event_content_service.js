@@ -13,10 +13,10 @@ const postEventContent = async (data) => {
     }
 }
 
-const postDraftEventContent = async (data) => {
+const postDraftEventContent = async (contentId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.postDraftEventContent(data))
+        [err, result] = await to(eventContentRepository.postDraftEventContent(contentId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -27,10 +27,10 @@ const postDraftEventContent = async (data) => {
     }
 }
 
-const deleteEventContent = async (data) => {
+const deleteEventContent = async (contentId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.deleteEventContent(data))
+        [err, result] = await to(eventContentRepository.deleteEventContent(contentId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -41,10 +41,10 @@ const deleteEventContent = async (data) => {
     }
 }
 
-const userDfratEventContent = async (data) => {
+const userDfratEventContent = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.userDfratEventContent(data))
+        [err, result] = await to(eventContentRepository.userDfratEventContent(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -55,10 +55,10 @@ const userDfratEventContent = async (data) => {
     }
 }
 
-const userPostedEventContent = async (data) => {
+const userPostedEventContent = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.userPostedEventContent(data))
+        [err, result] = await to(eventContentRepository.userPostedEventContent(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

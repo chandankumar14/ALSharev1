@@ -19,7 +19,7 @@ const postContent = async (data) => {
 const postDraftcontent = async (data) => {
     try {
         let err, result
-        [err, result] = await to(contentModel.query().update({ contentStatus: true })
+        [err, result] = await to(contentModel.query().update({ contentStatus: 1 })
             .where({ "userId": data.userId })
             .where({ "contentId": data.contentId }));
         if (err) {
@@ -36,8 +36,8 @@ const userDraftContentList = async (data) => {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
             .where({ "userId": data.userId })
-            .where({ "contentStatus": false })
-            .where({ "delete": false }));
+            .where({ "contentStatus": 0 })
+            .where({ "delete": 0 }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -52,8 +52,8 @@ const userPostedContentList = async (data) => {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
             .where({ "userId": data.userId })
-            .where({ "contentStatus": true })
-            .where({ "delete": false }));
+            .where({ "contentStatus": 1 })
+            .where({ "delete": 0 }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -67,7 +67,7 @@ const userPostedContentList = async (data) => {
 const deletePostedContent = async (data) => {
     try {
         let err, result
-        [err, result] = await to(contentModel.query().update({ delete: false })
+        [err, result] = await to(contentModel.query().update({ delete: 1 })
             .where({ "userId": data.userId })
             .where({ "contentId": data.contentId }));
         if (err) {
@@ -84,14 +84,14 @@ const postedContentList = async (data) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
-            .eager('[action,rating,user_details]')
-            .modifyEager('action', (builder) => builder.select("*")
-                .where({ "active": true }))
-            .modifyEager("rating", (builder) => builder.select("*")
-                .where({ "active": true }))
-            .modifyEager("user_details", (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
-            .where({ "contentStatus": true })
-            .where({ "delete": false }))
+            .withGraphFetched('[action,rating,user_details]')
+            .modifyGraph('action', (builder) => builder.select("*")
+                .where({ "active": 1 }))
+            .modifyGraph("rating", (builder) => builder.select("*")
+                .where({ "active": 1 }))
+            .modifyGraph("user_details", (builder) => builder.select("*"))
+            .where({ "contentStatus": 1 })
+            .where({ "delete": 0 }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -107,9 +107,9 @@ const contentRating = async (data) => {
         let err, result1, result2, result3
         const payload = {
             contentId: data.contentId,
-            rating: data.current,
+            rating: data.rating,
             userId: data.userId,
-            active: true
+            active: 1
         }
         const finalValue = Number(parseFloat(((data.rating * data.userCount) + (last - current)) / data.userCount).toFixed(2))
         // ***********event content rating seaction *********
@@ -125,7 +125,7 @@ const contentRating = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(contentRatingModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            [err, result2] = await to(contentRatingModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
             if (err) {
                 throw ErrorResponse(err.message)
             }
@@ -147,8 +147,8 @@ const contentAction = async (data) => {
     try {
         let err, result2, result3
         const payload = {
-            userId: data.contentId,
-            contentId: data.current,
+            userId: data.userId,
+            contentId: data.contentId,
             typeId: data.typeId,
             name: data.name,
             value: data.value,
@@ -160,12 +160,12 @@ const contentAction = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(contentActionModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            [err, result2] = await to(contentActionModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
             if (err) {
                 throw ErrorResponse(err.message)
             }
 
-            [err, result3] = await to(await to(contentActionModel.query().insert(payload)))
+            [err, result3] =await to(contentActionModel.query().insert(payload))
             if (err) {
                 throw ErrorResponse(err.message)
             }

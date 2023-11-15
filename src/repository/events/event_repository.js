@@ -18,7 +18,7 @@ const createEvent = async (data) => {
 const postDraftevent = async (date) => {
     try {
         let err, result
-        [err, result] = await to(eventModel.query().update({ "event_status": true })
+        [err, result] = await to(eventModel.query().update({ "event_status": 1 })
             .where({ "userId": date.userId }));
 
         if (err) {
@@ -36,7 +36,7 @@ const draftEventListByUserId = async (data) => {
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .where({ "userId": data.userId })
-            .where({ "event_status": false })
+            .where({ "event_status": 0 })
             .where("end_date", ">=", Today_Date))
 
         if (err) {
@@ -54,7 +54,7 @@ const postedEventListByUserId = async (data) => {
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .where({ "userId": data.userId })
-            .where({ "event_status": true })
+            .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))
         if (err) {
             throw ErrorResponse(err.message)
@@ -70,10 +70,10 @@ const AllPostedeventList = async (data) => {
         const Today_Date = moment().format();
         let err, result
         [err, result] = await to(eventModel.query().select("*")
-            .eager('[event_owner,participant]')
-            .modifyEager('event_owner', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
-            .modifyEager("participant", (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
-            .where({ "event_status": true })
+            .withGraphFetched('[event_owner,participant]')
+            .modifyGraph('event_owner', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .modifyGraph("participant", (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))
         if (err) {
             throw ErrorResponse(err.message)

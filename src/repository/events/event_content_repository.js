@@ -32,7 +32,7 @@ const postDraftEventContent = async (data) => {
 const deleteEventContent = async (data) => {
     try {
         let err, result
-        [err, result] = await to(eventContentModel.query().update({ "delete": true })
+        [err, result] = await to(eventContentModel.query().update({ "delete": 1 })
             .where({ "contentId": data.contentId }))
         if (err) {
             throw ErrorResponse(err.message)
@@ -47,14 +47,14 @@ const eventContentList = async (data) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .eager('[action,rating]')
-            .modifyEager('action', (builder) => builder.select("*")
-                .where({ "active": true }))
-            .modifyEager("rating", (builder) => builder.select("*")
-                .where({ "active": true }))
+            .withGraphFetched('[action,rating]')
+            .modifyGraph('action', (builder) => builder.select("*")
+                .where({ "active": 1 }))
+            .modifyGraph("rating", (builder) => builder.select("*")
+                .where({ "active": 1 }))
             .where({ "eventId": data.eventId })
-            .where({ "status": true })
-            .where({ "delete": false }))
+            .where({ "status": 1 })
+            .where({ "delete": 0 }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -71,8 +71,8 @@ const userDfratEventContent = async (data) => {
         [err, result] = await to(eventContentModel.query().select("*")
             .where({ "userId": data.userId })
             .where({ "eventId": data.eventId })
-            .where({ "status": false })
-            .where({ "delete": false }))
+            .where({ "status": 0 })
+            .where({ "delete": 0 }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -89,8 +89,8 @@ const userPostedEventContent = async (data) => {
         [err, result] = await to(eventContentModel.query().select("*")
             .where({ "userId": data.userId })
             .where({ "eventId": data.eventId })
-            .where({ "status": true })
-            .where({ "delete": false }))
+            .where({ "status": 1 })
+            .where({ "delete": 0}))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -123,7 +123,7 @@ const eventContentRating = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(eventContentRatingModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            [err, result2] = await to(eventContentRatingModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
             if (err) {
                 throw ErrorResponse(err.message)
             }
@@ -158,7 +158,7 @@ const eventContentAction = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(eventContentActionModel.query().update({ active: false }).where({ "actionId": data.actionId }))
+            [err, result2] = await to(eventContentActionModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
             if (err) {
                 throw ErrorResponse(err.message)
             }

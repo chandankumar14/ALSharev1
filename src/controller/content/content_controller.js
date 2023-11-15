@@ -1,5 +1,4 @@
 const contentService = require("../../service/content/content_service")
-
 const postContent = async (req, res) => {
     let result, data
     data = req.body

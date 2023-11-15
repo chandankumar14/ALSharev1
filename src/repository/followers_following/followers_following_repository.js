@@ -36,12 +36,12 @@ const unFollow = async (data) => {
     try {
         let err, result1, result12
         //***********updating followers table ******* */
-        [err, result1] = await to(followersModel.query().update({ "status": true }).where({ "userId": data.unFollowinguserId }));
+        [err, result1] = await to(followersModel.query().update({ "status": 1 }).where({ "userId": data.unFollowinguserId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
         //**********updating following table here ************* */
-        [err, result12] = await to(followingModel.query().update({ "status": true }).where({ "userId": data.userId }))
+        [err, result12] = await to(followingModel.query().update({ "status": 1 }).where({ "userId": data.userId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -57,10 +57,10 @@ const userFollowingList = async (data) => {
     try {
         let err, result
         [err, result] = await to(followingModel.query().select("*")
-            .eager('[following]')
-            .modifyEager('following', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .withGraphFetched('[following]')
+            .modifyGraph('following', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
             .where({ "userId": data.userId })
-            .where({ "status": true }))
+            .where({ "status": 1 }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -74,10 +74,10 @@ const userFollowersList = async (data) => {
     try {
         let err, result
         [err, result] = await to(followersModel.query().select("*")
-            .eager('[followers]')
-            .modifyEager('followers', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .withGraphFetched('[followers]')
+            .modifyGraph('followers', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
             .where({ "userId": data.userId })
-            .where({ "status": true }))
+            .where({ "status": 1 }))
         if (err) {
             throw ErrorResponse(err.message)
         }

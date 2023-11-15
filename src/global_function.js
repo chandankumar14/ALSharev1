@@ -1,5 +1,4 @@
 pe = require('parse-error'); //parses error so you can read error message and handle them accordingly
-
 // The error returned by this function is handled in the error handler middleware in app.js.
 createStatusCodeError = function (statusCode, message) {
   return Object.assign(new Error(), {

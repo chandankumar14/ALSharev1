@@ -7,3 +7,5 @@ const transactionController = require("../../controller/index").transactionContr
 
 Router.post(`/payment_initate`, authMiddleware, transactionController.eventPaymentInitiation);
 Router.post(`/payment_completion`, authMiddleware, transactionController.eventPaymentComplection)
+
+module.exports = Router

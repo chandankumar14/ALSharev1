@@ -20,7 +20,7 @@ App.use(cors());
 App.use(body_parser.json());
 App.use(body_parser.urlencoded({extended:true}))
 //*********creating Routing configuration here ********* */
-App.use(`/`, v1);
+App.use(`/${API_URL}/`, v1);
 //*******************Swagger UI configuration is here*********** */
 
 const options = {

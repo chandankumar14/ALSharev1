@@ -143,7 +143,7 @@ const sendOTP = async (Email_Phone,deviceId) => {
             if (err) {
                 throw ErrorResponse(err.message)
             }
-            return result1
+            return [result1]
         } else {
             //***********sending OTP to mobile no ********** */
             const userName = common.generateUsername();
@@ -158,7 +158,7 @@ const sendOTP = async (Email_Phone,deviceId) => {
             if (err) {
                 throw ErrorResponse(err.message)
             }
-            return result1
+            return [result1]
         }
 
     } catch (err) {

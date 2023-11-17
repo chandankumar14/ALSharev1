@@ -19,6 +19,7 @@ const App = express();
 App.use(cors());
 App.use(body_parser.json());
 App.use(body_parser.urlencoded({extended:true}))
+App.use(`/${API_URL}/`,express.static("user_profile_image"))
 //*********creating Routing configuration here ********* */
 App.use(`/${API_URL}/`, v1);
 //*******************Swagger UI configuration is here*********** */

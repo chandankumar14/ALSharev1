@@ -191,8 +191,21 @@ const OTPVerification = async (data) => {
     }
 }
 
+const editUserProfile = async (data, userId) => {
+    try {
+        let err, result
+        [err, result] = await to(userModel.query().update(data).where({ "userId": userId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 
 module.exports = {
     user_singIn_signUp,
-    OTPVerification
+    OTPVerification,
+    editUserProfile
 }

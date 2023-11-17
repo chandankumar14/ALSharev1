@@ -34,8 +34,37 @@ const OTPVerification = async (req, res) => {
         throw badRequestError(err.message)
     }
 }
+const editUserProfile = async (req, res) => {
+    let result
+    let payload = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        middleName: req.body.middleName,
+        email: req.body.email,
+        location: req.body.location,
+        profileImage: req?.file?.filename ? req.file.filename : req.body.profileImage,
+        about: req.body.about,
+        DOB: req.body.DOB,
+        phone: req.body.phone,
+        Gender: req.body.Gender
+    };
+    let userId = req.body.userId
+    try {
+        [err, result] = await to(userService.editUserProfile(payload, userId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your profile is updated successfully");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 
 module.exports = {
     user_singIn_signUp,
-    OTPVerification
+    OTPVerification,
+    editUserProfile
 }

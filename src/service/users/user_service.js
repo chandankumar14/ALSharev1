@@ -25,8 +25,21 @@ const OTPVerification = async (data) => {
     }
 }
 
+const editUserProfile = async (data,userId) => {
+    let err, result
+    try {
+        [err, result] = await to(userRepository.editUserProfile(data,userId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 
 module.exports = {
     user_singIn_signUp,
-    OTPVerification
+    OTPVerification,
+    editUserProfile
 }

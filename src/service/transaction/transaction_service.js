@@ -26,7 +26,35 @@ const eventPaymentComplection = async (data) => {
     }
 }
 
+const addToWalletInitiation = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.addToWalletInitiation(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const addToWalletPaymentCompletion = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.addToWalletPaymentCompletion(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation,
-    eventPaymentComplection 
+    eventPaymentComplection ,
+    addToWalletInitiation,
+    addToWalletPaymentCompletion
 }

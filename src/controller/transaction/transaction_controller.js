@@ -33,7 +33,43 @@ const eventPaymentComplection = async (req, res) => {
     }
 }
 
+const addToWalletInitiation = async (req, res) => {
+    let result, data,err
+    data = req.body
+    try {
+        [err, result] = await to(transactionService.addToWalletInitiation(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your transaction is initiated..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+const addToWalletPaymentCompletion = async (req, res) => {
+    let result, data,err
+    data = req.body
+    try {
+        [err, result] = await to(transactionService.addToWalletPaymentCompletion(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "payment is completed successfully..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation ,
-    eventPaymentComplection
+    eventPaymentComplection,
+    addToWalletInitiation,
+    addToWalletPaymentCompletion
 }

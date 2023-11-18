@@ -5,8 +5,8 @@
 exports.up = function (knex) {
     return knex.schema.createTable("content", table => {
       table.increments("contentId").primary()
-      table.string("title", 10, 100)
-      table.string("description", 100, 1000)
+      table.string("title")
+      table.string("description")
       table.json("tags")
       table.string("originalSourcePath") // this is original path of content like youtube url or other media url
       table.string("customSourcePath") // this is customize url 

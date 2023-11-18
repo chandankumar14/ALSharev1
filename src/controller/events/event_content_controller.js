@@ -36,9 +36,11 @@ const deleteEventContent = async (req, res) => {
 
 const postDraftEventContent = async (req, res) => {
     let result, err
-    let contentId = req.params.contentId;
+    let contentId = req.body.contentId;
+    let eventId = req.body.eventId;
+    let userId = req.body.userId
     try {
-        [err, result] = await to(eventContentService.postDraftEventContent(contentId))
+        [err, result] = await to(eventContentService.postDraftEventContent(contentId,eventId,userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -87,10 +89,10 @@ const userPostedEventContent = async (req, res) => {
 }
 
 const eventContentList = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+    let eventId= req.params.eventId
     try {
-        [err, result] = await to(eventContentService.eventContentList(data))
+        [err, result] = await to(eventContentService.eventContentList(eventId))
         if (err) {
             throw badRequestError(err.message)
         }

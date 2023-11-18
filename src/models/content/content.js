@@ -17,7 +17,7 @@ class content extends Model {
                     to: 'content_action.contentId'
                 }
             },
-            rating: {
+            rating_list: {
                 relation: Model.HasManyRelation,
                 modelClass: content_rating,
                 join: {

@@ -14,10 +14,10 @@ const createEvent = async (data) => {
     }
 }
 // ********** posting draft event here ************
-const postDraftevent = async (eventId) => {
+const postDraftevent = async (eventId,userId) => {
     try {
         let err, result
-        [err, result] = await to(eventRepository.postDraftevent(eventId))
+        [err, result] = await to(eventRepository.postDraftevent(eventId,userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

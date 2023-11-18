@@ -18,9 +18,10 @@ const postContent = async (req, res) => {
 
 const postDraftcontent = async (req, res) => {
     let result,err
-    let contentId = req.params.contentId;
+    let contentId = req.body.contentId;
+    let userId = req.body.userId
     try {
-        [err, result] = await to(contentService.postDraftcontent(contentId))
+        [err, result] = await to(contentService.postDraftcontent(contentId,userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -70,9 +71,10 @@ const userPostedContentList = async (req, res) => {
 
 const deletePostedContent = async (req, res) => {
     let result, err
-    let contentId = req.params.contentId
+    let contentId = req.body.contentId
+    let userId = req.body.userId
     try {
-        [err, result] = await to(contentService.deletePostedContent(contentId))
+        [err, result] = await to(contentService.deletePostedContent(contentId,userId))
         if (err) {
             throw badRequestError(err.message)
         }

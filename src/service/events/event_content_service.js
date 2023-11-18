@@ -13,10 +13,10 @@ const postEventContent = async (data) => {
     }
 }
 
-const postDraftEventContent = async (contentId) => {
+const postDraftEventContent = async (contentId,eventId,userId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.postDraftEventContent(contentId))
+        [err, result] = await to(eventContentRepository.postDraftEventContent(contentId,eventId,userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -70,10 +70,10 @@ const userPostedEventContent = async (userId) => {
 }
 
 
-const eventContentList = async (data) => {
+const eventContentList = async (eventId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.eventContentList(data))
+        [err, result] = await to(eventContentRepository.eventContentList(eventId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

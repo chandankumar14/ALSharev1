@@ -14,10 +14,10 @@ const postContent = async (data) => {
     }
 }
 
-const postDraftcontent = async (contentId) => {
+const postDraftcontent = async (contentId,userId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.postDraftcontent(contentId))
+        [err, result] = await to(contentRepository.postDraftcontent(contentId,userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
@@ -56,10 +56,10 @@ const userPostedContentList = async (userId) => {
     }
 }
 
-const deletePostedContent = async (contentId) => {
+const deletePostedContent = async (contentId,userId) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.deletePostedContent(contentId))
+        [err, result] = await to(contentRepository.deletePostedContent(contentId,userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

@@ -22,9 +22,10 @@ const createEvent = async (req, res) => {
 
 const postDraftevent = async (req, res) => {
     let result, err
-    let eventId= req.params.eventId;
+    let eventId= req.body.eventId;
+    let userId = req.body.userId
     try {
-        [err, result] = await to(eventService.postDraftevent(eventId))
+        [err, result] = await to(eventService.postDraftevent(eventId,userId))
         if (err) {
             throw badRequestError(err.message)
         }

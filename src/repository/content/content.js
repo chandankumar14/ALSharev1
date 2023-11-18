@@ -16,11 +16,12 @@ const postContent = async (data) => {
     }
 }
 //*************posting draft content ********** */
-const postDraftcontent = async (contentId) => {
+const postDraftcontent = async (contentId,userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ contentStatus: 1 })
-           .where({ "contentId": contentId }));
+            .where({ "contentId": contentId })
+            .where({ "userId": userId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -63,11 +64,12 @@ const userPostedContentList = async (userId) => {
 }
 
 // ******delete posted content **********
-const deletePostedContent = async (contentId) => {
+const deletePostedContent = async (contentId,userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ delete: 1 })
-           .where({ "contentId": contentId }));
+           .where({ "contentId": contentId })
+           .where({"userId":userId}));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -82,10 +84,10 @@ const postedContentList = async () => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().select("*")
-            .withGraphFetched('[action,rating,user_details]')
+            .withGraphFetched('[action,rating_list,user_details]')
             .modifyGraph('action', (builder) => builder.select("*")
                 .where({ "active": 1 }))
-            .modifyGraph("rating", (builder) => builder.select("*")
+            .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 }))
             .modifyGraph("user_details", (builder) => builder.select("*"))
             .where({ "contentStatus": 1 })
@@ -102,39 +104,40 @@ const postedContentList = async () => {
 //**********Rating functionality is here ********** */
 const contentRating = async (data) => {
     try {
-        let err, result1, result2, result3
+        let err, result1, result2, result3,result4, finalValue
         const payload = {
             contentId: data.contentId,
             rating: data.current,
             userId: data.userId,
             active: 1
         }
-        const finalValue = Number(parseFloat(((data.rating * data.userCount) + (last - current)) / data.userCount).toFixed(2))
-        // ***********event content rating seaction *********
-        [err, result1] = await to(contentModel.query().update({ rating: finalValue, userCount: userCount })
-            .where({ "contentId": data.contentId }))
+        finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.current - data.last)) / data.userCount).toFixed(2))
+       // ***********event content rating seaction *********
+      [err, result1] = await to(contentModel.query().update({ rating: finalValue, userCount: data.userCount })
+            .where({ "contentId": data.contentId }));
         if (err) {
-            throw ErrorResponse(err.message)
+           throw ErrorResponse(err.message)
         }
         if (data.firstTime) {
-            [err, result2] = await to(contentRatingModel.query().insert(payload))
+            [err, result2] = await to(contentRatingModel.query().insert(payload));
             if (err) {
                 throw ErrorResponse(err.message)
             }
             return result2
         } else {
-            [err, result2] = await to(contentRatingModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
+            [err, result3] = await to(contentRatingModel.query().update({ active: 0 })
+                .where({ "actionId": data.actionId }));
             if (err) {
                 throw ErrorResponse(err.message)
             }
-
-            [err, result3] = await to(await to(contentRatingModel.query().insert(payload)))
-            if (err) {
-                throw ErrorResponse(err.message)
+            if (result3 && result3 != undefined) {
+                [err, result4] = await to(await to(contentRatingModel.query().insert(payload)));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result4
             }
-            return result3
         }
-
 
     } catch (err) {
         throw ErrorResponse(err.message)

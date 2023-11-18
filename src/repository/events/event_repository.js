@@ -15,11 +15,12 @@ const createEvent = async (data) => {
 }
 
 //*************posting draft event ********* */
-const postDraftevent = async (eventId) => {
+const postDraftevent = async (eventId,userId) => {
     try {
         let err, result
         [err, result] = await to(eventModel.query().update({ "event_status": 1 })
-            .where({ "eventId": eventId }));
+            .where({ "eventId": eventId })
+            .where({ "userId": userId }));
 
         if (err) {
             throw ErrorResponse(err.message)
@@ -32,12 +33,10 @@ const postDraftevent = async (eventId) => {
 // *********** Fetching All Draft event of User ************
 const draftEventListByUserId = async (userId) => {
     try {
-        const Today_Date = moment().format();
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .where({ "userId": userId })
-            .where({ "event_status": 0 })
-            .where("end_date", ">=", Today_Date))
+            .where({ "event_status": 0 }))
 
         if (err) {
             throw ErrorResponse(err.message)
@@ -71,8 +70,8 @@ const AllPostedeventList = async (data) => {
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .withGraphFetched('[event_owner,participant]')
-            .modifyGraph('event_owner', (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
-            .modifyGraph("participant", (builder) => builder.select("userId", "firstName", "lastName", "middleName", "email"))
+            .modifyGraph('event_owner', (builder) => builder.select("*"))
+            .modifyGraph("participant", (builder) => builder.select("*").where({"status":1}))
             .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))
         if (err) {

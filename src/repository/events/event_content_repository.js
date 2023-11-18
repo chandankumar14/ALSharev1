@@ -15,11 +15,13 @@ const postEventContent = async (data) => {
     }
 }
 //*********Post draft event content ********* */
-const postDraftEventContent = async (contentId) => {
+const postDraftEventContent = async (contentId,eventId,userId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().update({ "status": 1 })
-            .where({ "contentId": contentId }))
+            .where({ "contentId": contentId })
+            .where({ "eventId": eventId })
+            .where({ "userId": userId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -43,7 +45,7 @@ const deleteEventContent = async (contentId) => {
     }
 }
 //*************All event List ******* */
-const eventContentList = async (data) => {
+const eventContentList = async (eventId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
@@ -52,7 +54,7 @@ const eventContentList = async (data) => {
                 .where({ "active": 1 }))
             .modifyGraph("rating", (builder) => builder.select("*")
                 .where({ "active": 1 }))
-            .where({ "eventId": data.eventId })
+            .where({ "eventId": eventId })
             .where({ "status": 1 })
             .where({ "delete": 0 }))
         if (err) {

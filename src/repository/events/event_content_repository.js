@@ -15,7 +15,7 @@ const postEventContent = async (data) => {
     }
 }
 //*********Post draft event content ********* */
-const postDraftEventContent = async (contentId,eventId,userId) => {
+const postDraftEventContent = async (contentId, eventId, userId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().update({ "status": 1 })
@@ -88,9 +88,9 @@ const userPostedEventContent = async (userId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .where({ "userId": userId})
+            .where({ "userId": userId })
             .where({ "status": 1 })
-            .where({ "delete": 0}))
+            .where({ "delete": 0 }))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -111,31 +111,44 @@ const eventContentRating = async (data) => {
         }
         const finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.last - data.current)) / data.userCount).toFixed(2))
         // ***********event content rating seaction *********
-        [err, result1] = await to(eventContentModel.query().update({ rating: finalValue, userCount: userCount })
+        [err, result1] = await to(eventContentModel.query()
+            .update({ rating: finalValue, userCount: userCount })
             .where({ "contentId": data.contentId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
-        if (data.firstTime) {
-            [err, result2] = await to(eventContentRatingModel.query().insert(payload))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            return result2
-        } else {
-            [err, result2] = await to(eventContentRatingModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
+        if (result1 && result1 != undefined) {
+            try {
+                if (data.firstTime) {
+                    [err, result2] = await to(eventContentRatingModel.query().insert(payload))
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result2
+                } else {
+                    [err, result2] = await to(eventContentRatingModel.query()
+                        .update({ active: 0 })
+                        .where({ "actionId": data.actionId }))
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    if (result2 && result2 != undefined) {
+                        try {
+                            [err, result3] = await to(eventContentRatingModel.query().insert(payload));
+                            if (err) {
+                                throw ErrorResponse(err.message)
+                            }
+                            return result3
+                        } catch (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                    }
+                }
 
-            [err, result3] = await to(await to(eventContentRatingModel.query().insert(payload)))
-            if (err) {
+            } catch (err) {
                 throw ErrorResponse(err.message)
             }
-            return result3
         }
-
-
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -158,16 +171,23 @@ const eventContentAction = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(eventContentActionModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
+            [err, result2] = await to(eventContentActionModel.query()
+                .update({ active: 0 })
+                .where({ "actionId": data.actionId }))
             if (err) {
                 throw ErrorResponse(err.message)
             }
-
-            [err, result3] = await to(await to(eventContentActionModel.query().insert(payload)))
-            if (err) {
-                throw ErrorResponse(err.message)
+            if (result2 && result2 != undefined) {
+                try {
+                    [err, result3] = await to(eventContentActionModel.query().insert(payload))
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result3
+                } catch (err) {
+                    throw ErrorResponse(err.message)
+                }
             }
-            return result3
         }
 
     } catch (err) {

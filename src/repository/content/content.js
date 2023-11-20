@@ -16,7 +16,7 @@ const postContent = async (data) => {
     }
 }
 //*************posting draft content ********** */
-const postDraftcontent = async (contentId,userId) => {
+const postDraftcontent = async (contentId, userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ contentStatus: 1 })
@@ -64,12 +64,12 @@ const userPostedContentList = async (userId) => {
 }
 
 // ******delete posted content **********
-const deletePostedContent = async (contentId,userId) => {
+const deletePostedContent = async (contentId, userId) => {
     try {
         let err, result
         [err, result] = await to(contentModel.query().update({ delete: 1 })
-           .where({ "contentId": contentId })
-           .where({"userId":userId}));
+            .where({ "contentId": contentId })
+            .where({ "userId": userId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -89,7 +89,8 @@ const postedContentList = async () => {
                 .where({ "active": 1 }))
             .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 }))
-            .modifyGraph("user_details", (builder) => builder.select("*"))
+            .modifyGraph("user_details", (builder) => builder
+                .select("userId", "firstName", "lastName", "middleName", "email"))
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 }))
         if (err) {
@@ -104,7 +105,7 @@ const postedContentList = async () => {
 //**********Rating functionality is here ********** */
 const contentRating = async (data) => {
     try {
-        let err, result1, result2, result3,result4, finalValue
+        let err, result2, result3, result4, finalValue
         const payload = {
             contentId: data.contentId,
             rating: data.current,
@@ -112,33 +113,45 @@ const contentRating = async (data) => {
             active: 1
         }
         finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.current - data.last)) / data.userCount).toFixed(2))
-       // ***********event content rating seaction *********
-      [err, result1] = await to(contentModel.query().update({ rating: finalValue, userCount: data.userCount })
+        // ***********event content rating seaction *********
+        const result1 = await to(contentModel.query()
+            .update({ rating: finalValue, userCount: data.userCount })
             .where({ "contentId": data.contentId }));
-        if (err) {
-           throw ErrorResponse(err.message)
-        }
-        if (data.firstTime) {
-            [err, result2] = await to(contentRatingModel.query().insert(payload));
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            return result2
-        } else {
-            [err, result3] = await to(contentRatingModel.query().update({ active: 0 })
-                .where({ "actionId": data.actionId }));
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            if (result3 && result3 != undefined) {
-                [err, result4] = await to(await to(contentRatingModel.query().insert(payload)));
-                if (err) {
-                    throw ErrorResponse(err.message)
+        if (result1 && result1 != undefined) {
+            try {
+                if (data.firstTime) {
+                    try {
+                        [err, result2] = await to(contentRatingModel.query().insert(payload));
+                        if (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                        return result2
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                } else {
+                    [err, result3] = await to(contentRatingModel.query()
+                        .update({ active: 0 })
+                        .where({ "actionId": data.actionId }));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    if (result3 && result3 != undefined) {
+                        try {
+                            [err, result4] = await to(contentRatingModel.query().insert(payload));
+                            if (err) {
+                                throw ErrorResponse(err.message)
+                            }
+                            return result4
+                        } catch (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                    }
                 }
-                return result4
+            } catch (err) {
+                throw ErrorResponse(err.message)
             }
         }
-
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -161,18 +174,29 @@ const contentAction = async (data) => {
             }
             return result2
         } else {
-            [err, result2] = await to(contentActionModel.query().update({ active: 0 }).where({ "actionId": data.actionId }))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
+            try {
+                [err, result2] = await to(contentActionModel.query()
+                    .update({ active: 0 })
+                    .where({ "actionId": data.actionId }));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                if (result2 && result2 != undefined) {
+                    try {
+                        [err, result3] = await to(contentActionModel.query().insert(payload))
+                        if (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                        return result3
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                }
 
-            [err, result3] =await to(contentActionModel.query().insert(payload))
-            if (err) {
+            } catch (err) {
                 throw ErrorResponse(err.message)
             }
-            return result3
         }
-
     } catch (err) {
         throw ErrorResponse(err.message)
     }

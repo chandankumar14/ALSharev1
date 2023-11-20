@@ -106,7 +106,7 @@ const eventContentList = async (req, res) => {
 }
 
 const eventContentRating = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
     try {
         [err, result] = await to(eventContentService.eventContentRating(data))
@@ -123,7 +123,7 @@ const eventContentRating = async (req, res) => {
 }
 
 const eventContentAction = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
     try {
         [err, result] = await to(eventContentService.eventContentAction(data))

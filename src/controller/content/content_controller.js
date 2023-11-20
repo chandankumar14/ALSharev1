@@ -1,6 +1,6 @@
 const contentService = require("../../service/content/content_service")
 const postContent = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
     try {
         [err, result] = await to(contentService.postContent(data))
@@ -104,7 +104,7 @@ const postedContentList = async (req, res) => {
 }
 
 const contentRating = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
     try {
         [err, result] = await to(contentService.contentRating(data))
@@ -121,7 +121,7 @@ const contentRating = async (req, res) => {
 }
 
 const contentAction = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
     try {
         [err, result] = await to(contentService.contentAction(data))

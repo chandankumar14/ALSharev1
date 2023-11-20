@@ -2,9 +2,9 @@ const followersFollowingService = require("../../service/followers_following/fol
 
 //******* Follow user ************ */
 const follow = async (req, res) => {
-    let result, data
+    let result, data,err
     data = req.body
-    try {
+   try {
         [err, result] = await to(followersFollowingService.follow(data))
         if (err) {
             throw badRequestError(err.message)
@@ -37,10 +37,10 @@ const unFollow = async (req, res) => {
 }
 //***********userFollowers List ********** */
 const userFollowersList = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+   let userId = req.params.userId
     try {
-        [err, result] = await to(followersFollowingService.userFollowersList(data))
+        [err, result] = await to(followersFollowingService.userFollowersList(userId))
         if (err) {
             throw badRequestError(err.message)
         }
@@ -54,10 +54,10 @@ const userFollowersList = async (req, res) => {
 }
 
 const userFollowingList = async (req, res) => {
-    let result, data
-    data = req.body
+    let result, err
+   let userId = req.params.userId
     try {
-        [err, result] = await to(followersFollowingService.userFollowingList(data))
+        [err, result] = await to(followersFollowingService.userFollowingList(userId))
         if (err) {
             throw badRequestError(err.message)
         }

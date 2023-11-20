@@ -8,6 +8,7 @@ const follow = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -21,19 +22,21 @@ const unFollow = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
     }
 }
 //********users following List ******** */
-const userFollowingList = async (data) => {
+const userFollowingList = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(followersFollowingRepository.userFollowingList(data))
+        [err, result] = await to(followersFollowingRepository.userFollowingList(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -41,13 +44,14 @@ const userFollowingList = async (data) => {
 }
 
 
-const userFollowersList = async (data) => {
+const userFollowersList = async (userId) => {
     try {
         let err, result
-        [err, result] = await to(followersFollowingRepository.userFollowersList(data))
+        [err, result] = await to(followersFollowingRepository.userFollowersList(userId))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)

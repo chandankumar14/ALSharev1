@@ -152,6 +152,7 @@ const sendOTP = async (Email_Phone,deviceId) => {
                 firstName: userName,
                 phone: Email_Phone,
                 OTP: result.encrypt_pass,
+                deviceId:deviceId
             };
             [err, result1] = await to(userModel.query().insert(userpayload1));
             msg.msg =`OTP has been sent to your Mobile No  ${Email_Phone}`

@@ -63,8 +63,26 @@ const editUserProfile = async (req, res) => {
     }
 }
 
+const user_details = async (req, res) => {
+    let result ,err
+    let userId = req.params.userId
+    try {
+        [err, result] = await to(userService.user_details(userId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your profile is profile details fetch successfully");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
-    editUserProfile
+    editUserProfile,
+    user_details
 }

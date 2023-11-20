@@ -7,6 +7,7 @@ const eventPaymentInitiation = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -20,6 +21,7 @@ const eventPaymentComplection = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -33,6 +35,7 @@ const addToWalletInitiation = async (data) => {
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)
@@ -42,10 +45,11 @@ const addToWalletInitiation = async (data) => {
 const addToWalletPaymentCompletion = async (data) => {
     try {
         let err, result
-        [err, result] = await to(transactionRepository.addToWalletPaymentCompletion(data))
+        [err, result] = await to(transactionRepository.addToWalletPaymentCompletion(data));
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }
+        return result
     }
     catch (err) {
         throw ErrorResponse(err.message)

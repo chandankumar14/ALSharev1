@@ -51,10 +51,10 @@ const addToWalletInitiation = async (req, res) => {
 }
 
 const addToWalletPaymentCompletion = async (req, res) => {
-    let result, data,err
+    let err,result, data
     data = req.body
     try {
-        [err, result] = await to(transactionService.addToWalletPaymentCompletion(data))
+        [err, result] = await to(transactionService.addToWalletPaymentCompletion(data));
         if (err) {
             throw badRequestError(err.message)
         }

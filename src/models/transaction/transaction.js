@@ -1,7 +1,7 @@
 const Model = require('objection').Model;
 class transaction extends Model {
     static get tableName() {
-        return 'transaction';
+        return 'transactions';
     }
 }
 module.exports  = transaction

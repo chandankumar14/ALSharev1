@@ -11,13 +11,13 @@ const razorpaySecretKey = process.env.RAZORPAY_SECRET_KEY;
 // **********Transaction  inititation for Event Joining **********
 const eventPaymentInitiation = async (data) => {
     try {
-        let err, razorPayOrder, transaction_history
+        let err, transaction_history
         var razorPayInstance = new razorPay({
             key_id: razorpayKeyId,
             key_secret: razorpaySecretKey
         })
         var payload1 = {
-            amount: amount * 100,  // amount in the smallest currency unit
+            amount: (data.amount) * 100,  // amount in the smallest currency unit
             currency: "INR",
             receipt: data.email,
             notes: {
@@ -27,25 +27,28 @@ const eventPaymentInitiation = async (data) => {
             }
         }
         // ************creating order for payment ************
-        [err, razorPayOrder] = await to(razorPayInstance.orders.create(payload1));
-        if (err) {
-            throw ErrorResponse(err.message)
-        }
+        const razorPayOrder= await razorPayInstance.orders.create(payload1);
         // **********updating transaction_history_table **************
-        const payload = {
-            userId: data.userId,
-            eventId: data.eventId,
-            amount: data.amount,
-            orderId: razorPayOrder.id,
-            currency_code: 'INR',
-            initiated: true,
-            keyId: razorpayKeyId
+        if (razorPayOrder && razorPayOrder != undefined) {
+            try {
+                const payload = {
+                    userId: data.userId,
+                    eventId: data.eventId,
+                    amount: data.amount,
+                    orderId: razorPayOrder.id,
+                    currency_code: 'INR',
+                    initiated: true,
+                    keyId: razorpayKeyId
+                };
+               [err, transaction_history] = await to(transactionModel.query().insert(payload))
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return transaction_history
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
         }
-        [err, transaction_history] = await to(transactionModel.query().insert(payload))
-        if (err) {
-            throw ErrorResponse(err.message)
-        }
-        return transaction_history
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -87,15 +90,15 @@ const eventPaymentComplection = async (data) => {
 
 // **********Transaction  inititation for adding amount in wallet **********
 
-const addToWalletInitiation = async(data)=>{
+const addToWalletInitiation = async (data) => {
     try {
-        let err, razorPayOrder, transaction_history
+        let err, transaction_history
         var razorPayInstance = new razorPay({
             key_id: razorpayKeyId,
             key_secret: razorpaySecretKey
         })
         var payload1 = {
-            amount: amount * 100,  // amount in the smallest currency unit
+            amount: data.amount * 100,  // amount in the smallest currency unit
             currency: "INR",
             receipt: data.email,
             notes: {
@@ -103,25 +106,27 @@ const addToWalletInitiation = async(data)=>{
                 message: "creating order Id for adding balance in ALPay.."
             }
         }
-        // ************creating order for payment ************
-        [err, razorPayOrder] = await to(razorPayInstance.orders.create(payload1));
-        if (err) {
-            throw ErrorResponse(err.message)
+        const razorPayOrder = await razorPayInstance.orders.create(payload1);
+        if (razorPayOrder && razorPayOrder != undefined) {
+            try {
+                const payload = {
+                    userId: data.userId,
+                    credit_amount: data.amount,
+                    orderId: razorPayOrder.id,
+                    currency_code: 'INR',
+                    initiated: true,
+                    keyId: razorpayKeyId
+                };
+                [err, transaction_history] = await to(ALPayModel.query().insert(payload))
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return transaction_history
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
         }
-        // **********updating transaction_history_table **************
-        const payload = {
-            userId: data.userId,
-            credit_amount: data.amount,
-            orderId: razorPayOrder.id,
-            currency_code: 'INR',
-            initiated: true,
-            keyId: razorpayKeyId
-        }
-        [err, transaction_history] = await to(ALPayModel.query().insert(payload))
-        if (err) {
-            throw ErrorResponse(err.message)
-        }
-        return transaction_history
+
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -129,16 +134,16 @@ const addToWalletInitiation = async(data)=>{
 
 const addToWalletPaymentCompletion =  async(data)=>{
     try {
-       let err, result1
+        let err, result1;
         //***********updating transaction table ********** */
-        const transPayload = {
+        let transPayload = {
             transId: data.transId,
             payment_mode: data.payment_mode,
-            paymentResponse: data.paymentResponse,
-            status:1
-        }
+            paymentResponse: data.paymentResponse ? data.paymentResponse : null,
+            status: 1
+        };
         [err, result1] = await to(ALPayModel.query().update(transPayload)
-            .where({ "orderId": data.orderId }))
+            .where({ "orderId": data.orderId }));
         if (err) {
             throw ErrorResponse(err.message)
         }

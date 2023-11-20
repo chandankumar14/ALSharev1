@@ -1,6 +1,7 @@
 const contentModel = require("../../models/content/content")
 const contentActionModel = require("../../models/content/content_action")
 const contentRatingModel = require("../../models/content/content_rating")
+const followingModel = require("../../models/following/following")
 
 //**********posting new content ***** */
 const postContent = async (data) => {
@@ -80,9 +81,9 @@ const deletePostedContent = async (contentId, userId) => {
 }
 
 // ********All posted content list ***********
-const postedContentList = async () => {
+const postedContentList = async (userId) => {
     try {
-        let err, result
+        let err, result, result1
         [err, result] = await to(contentModel.query().select("*")
             .withGraphFetched('[action,rating_list,user_details]')
             .modifyGraph('action', (builder) => builder.select("*")
@@ -96,7 +97,23 @@ const postedContentList = async () => {
         if (err) {
             throw ErrorResponse(err.message)
         }
-        return result
+        if (result && result != undefined) {
+            try {
+                [err, result1] = await to(followingModel.query().select("*")
+                    .where({ "userId": userId })
+                    .where({ "status": 1 }))
+                if (result1 && result1 != undefined) {
+                    result.map(item1 => {
+                        if (result1.filter(item2 => item2?.userId === item1?.user_details?.userId).length > 0) {
+                            item1.following = 1
+                        }
+                    })
+                }
+                return result
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
+        }
     } catch (err) {
         throw ErrorResponse(err.message)
     }

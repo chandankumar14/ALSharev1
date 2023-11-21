@@ -36,7 +36,8 @@ const draftEventListByUserId = async (userId) => {
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .where({ "userId": userId })
-            .where({ "event_status": 0 }))
+            .where({ "event_status": 0 })
+            .where({ "delete": 0 }))
 
         if (err) {
             throw ErrorResponse(err.message)
@@ -89,10 +90,27 @@ const AllPostedeventList = async (data) => {
     }
 }
 
+// delete draft event **********
+
+const deleteDraftevent = async (userId, eventId) => {
+    try {
+        let err, result;
+        [err, result] = await to(eventModel.query().update({ delete: 1 })
+            .where({ "userId": userId })
+            .where({ "eventId": eventId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports = {
     createEvent,
     postDraftevent,
     draftEventListByUserId,
     postedEventListByUserId,
-    AllPostedeventList
+    AllPostedeventList,
+    deleteDraftevent
 }

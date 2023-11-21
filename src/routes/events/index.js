@@ -11,7 +11,7 @@ Router.put(`/post_draft_event`, authMiddleware, eventController.postDraftevent)
 Router.get(`/posted_event_list_by_userId/:userId`, authMiddleware, eventController.postedEventListByUserId)
 Router.get(`/draft_event_list_by_userId/:userId`, authMiddleware, eventController.draftEventListByUserId)
 Router.get(`/all_posted_event_list`,authMiddleware, eventController.AllPostedeventList)
-
+Router.delete(`/delete_draft_event`, authMiddleware, eventController.deleteDraftevent)
 //*********event content Routing here********** */
 Router.post(`/post_event_content`, authMiddleware, eventContentcontroller.postEventContent)
 Router.get(`/delete_event_content/:contentId`, authMiddleware, eventContentcontroller.deleteEventContent)

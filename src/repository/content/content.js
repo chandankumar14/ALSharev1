@@ -2,7 +2,7 @@ const contentModel = require("../../models/content/content")
 const contentActionModel = require("../../models/content/content_action")
 const contentRatingModel = require("../../models/content/content_rating")
 const followingModel = require("../../models/following/following")
-
+const favouritesModel  = require("../../models/content/favourites")
 //**********posting new content ***** */
 const postContent = async (data) => {
     try {
@@ -219,6 +219,42 @@ const contentAction = async (data) => {
     }
 }
 
+const markAsFavourites = async (data) => {
+    let err, result
+    try {
+        [err, result] = await to(favouritesModel.query().insert(data));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const userFavouritesContentList = async (userId) => {
+    let err, result
+    try {
+        [err, result] = await to(favouritesModel.query().select("*")
+            .withGraphFetched('[content_details,content_owner,content_action_list,content_rating_list]')
+            .modifyGraph("content_details", (builder) =>
+                builder.select("*").where({ "delete": 0 }))
+            .modifyGraph("content_owner", (builder) => builder
+                .select("userId", "firstName", "lastName", "middleName", "email"))
+            .modifyGraph("content_action_list", (builder) =>
+                builder.select("*").where({ "active": 1 }))
+            .modifyGraph("content_rating_list", (builder) =>
+                builder.select("*").where({ "active": 1 }))
+            .where({ "userId": userId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postContent,
     postDraftcontent,
@@ -227,5 +263,7 @@ module.exports = {
     deletePostedContent,
     postedContentList,
     contentAction,
-    contentRating
+    contentRating,
+    markAsFavourites,
+    userFavouritesContentList
 }

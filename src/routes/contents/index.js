@@ -12,5 +12,7 @@ Router.delete(`/delete_posted_content`, authMiddleware, contentController.delete
 Router.get(`/posted_content_list/:userId`, authMiddleware, contentController.postedContentList)
 Router.post(`/content_rating`, authMiddleware, contentController.contentRating)
 Router.post(`/content_action`, authMiddleware, contentController.contentAction)
+Router.post(`/mark_favourites`, authMiddleware, contentController.markAsFavourites)
+Router.get(`/favourites_content_list/:userId`, authMiddleware, contentController.userFavouritesContentList)
 
 module.exports = Router

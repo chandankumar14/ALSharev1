@@ -137,6 +137,39 @@ const contentAction = async (req, res) => {
     }
 }
 
+const markAsFavourites = async (req, res) => {
+    let result, err,data
+    data = req.body
+    try {
+        [err, result] = await to(contentService.markAsFavourites(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "this content is saved as favourites....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+const userFavouritesContentList = async (req, res) => {
+    let result, err
+    let userId = req.params.userId
+    try {
+        [err, result] = await to(contentService.userFavouritesContentList(userId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your  favourites content list ....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 
 module.exports = {
     postContent,
@@ -146,5 +179,7 @@ module.exports = {
     deletePostedContent,
     postedContentList,
     contentRating,
-    contentAction
+    contentAction,
+    markAsFavourites,
+    userFavouritesContentList
 }

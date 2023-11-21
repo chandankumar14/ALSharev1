@@ -112,6 +112,34 @@ const contentAction = async (data) => {
     }
 }
 
+const markAsFavourites = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(contentRepository.markAsFavourites(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const userFavouritesContentList = async (userId) => {
+    try {
+        let err, result
+        [err, result] = await to(contentRepository.userFavouritesContentList(userId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postContent,
     postDraftcontent,
@@ -120,6 +148,8 @@ module.exports = {
     deletePostedContent,
     postedContentList,
     contentRating,
-    contentAction
+    contentAction,
+    markAsFavourites,
+    userFavouritesContentList
 
 }

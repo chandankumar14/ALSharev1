@@ -85,10 +85,28 @@ const walletBalance = async (req, res) => {
     }
 }
 
+const walletTransHistoryList = async (req, res) => {
+    let err,result;
+    let userId= req.params.userId
+    try {
+        [err, result] = await to(transactionService.walletTransHistoryList(userId));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your wallet transaction History list is fetch successfully..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation ,
     eventPaymentComplection,
     addToWalletInitiation,
     addToWalletPaymentCompletion,
-    walletBalance
+    walletBalance,
+    walletTransHistoryList
 }

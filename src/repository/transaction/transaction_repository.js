@@ -179,10 +179,27 @@ const walletBalance = async (userId) => {
     }
 }
 
+const walletTransHistoryList = async (userId) => {
+    try {
+        let err, result;
+        [err, result] = await to(ALPayModel.query()
+            .select("*")
+            .where({ "userId": userId })
+            .where({ "status": 1 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
     addToWalletInitiation,
     addToWalletPaymentCompletion,
-    walletBalance
+    walletBalance,
+    walletTransHistoryList
 }

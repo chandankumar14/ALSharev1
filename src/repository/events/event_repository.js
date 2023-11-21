@@ -70,8 +70,14 @@ const AllPostedeventList = async (data) => {
         let err, result
         [err, result] = await to(eventModel.query().select("*")
             .withGraphFetched('[event_owner,participant]')
-            .modifyGraph('event_owner', (builder) => builder.select("*"))
-            .modifyGraph("participant", (builder) => builder.select("*").where({"status":1}))
+            .modifyGraph('event_owner', (builder) =>
+                builder.select("firstName", "lastName", "middleName", "email", "profileImage"))
+            .modifyGraph("participant", (builder) =>
+                builder.join("users", "users.userId", "participants.userId")
+                    .select("participants.userId", "participants.eventId",
+                        "participants.joining_date", "participants.status",
+                        "firstName", "lastName", "middleName", "email", "profileImage")
+                    .where({ "status": 1 }))
             .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))
         if (err) {

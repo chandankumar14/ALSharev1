@@ -70,10 +70,25 @@ const walletBalance = async (userId) => {
     }
 }
 
+const walletTransHistoryList = async (userId) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.walletTransHistoryList(userId));
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation,
     eventPaymentComplection ,
     addToWalletInitiation,
     addToWalletPaymentCompletion,
-    walletBalance
+    walletBalance,
+    walletTransHistoryList
 }

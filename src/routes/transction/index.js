@@ -10,4 +10,5 @@ Router.post(`/payment_completion`, authMiddleware, transactionController.eventPa
 Router.post(`/payment_initated_to_wallet`, authMiddleware, transactionController.addToWalletInitiation);
 Router.post(`/wallet_payment_completion`, authMiddleware, transactionController.addToWalletPaymentCompletion);
 Router.get(`/user_wallet_balance/:userId`,authMiddleware,transactionController.walletBalance);
+Router.get(`/wallet_trans_history_list/:userId`,authMiddleware,transactionController.walletTransHistoryList);
 module.exports = Router 

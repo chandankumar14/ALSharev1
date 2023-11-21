@@ -67,9 +67,28 @@ const addToWalletPaymentCompletion = async (req, res) => {
     }
 }
 
+
+const walletBalance = async (req, res) => {
+    let err,result;
+    let userId= req.params.userId
+    try {
+        [err, result] = await to(transactionService.walletBalance(userId));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your wallet balance is fetch successfully..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation ,
     eventPaymentComplection,
     addToWalletInitiation,
-    addToWalletPaymentCompletion
+    addToWalletPaymentCompletion,
+    walletBalance
 }

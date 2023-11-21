@@ -62,27 +62,34 @@ const eventPaymentComplection = async (data) => {
         //***********updating transaction table ********** */
         const transPayload = {
             transId: data.transId,
-            payment_mode: data.payment_mode,
-            paymentResponse: data.paymentResponse,
+            payment_mode: data.payment_mode?data.payment_mode:null,
+            paymentResponse: data.paymentResponse?data.paymentResponse:null,
             status:1
-        }
+        };
         const participantPayload = {
             userId: data.userId,
             eventId: data.eventId,
             joining_date: Today_Date,
             status: 1
-        }
+        };
         [err, result1] = await to(transactionModel.query().update(transPayload)
             .where({ "orderId": data.orderId }))
         if (err) {
             throw ErrorResponse(err.message)
         }
         //**********updating participants table here ********** */
-        [err, result2] = await to(participants.query().insert(participantPayload))
-        if (err) {
-            throw ErrorResponse(err.message)
+        if (result1 && result1 != undefined) {
+            try {
+                [err, result2] = await to(participants.query().insert(participantPayload))
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result2
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
         }
-        return result2
+
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -100,12 +107,12 @@ const addToWalletInitiation = async (data) => {
         var payload1 = {
             amount: data.amount * 100,  // amount in the smallest currency unit
             currency: "INR",
-            receipt: data.email,
+            receipt: data.email?data.email:null,
             notes: {
                 userId: data.userId,
                 message: "creating order Id for adding balance in ALPay.."
             }
-        }
+        };
         const razorPayOrder = await razorPayInstance.orders.create(payload1);
         if (razorPayOrder && razorPayOrder != undefined) {
             try {
@@ -134,11 +141,11 @@ const addToWalletInitiation = async (data) => {
 
 const addToWalletPaymentCompletion =  async(data)=>{
     try {
-        let err, result1;
+        let err, result1
         //***********updating transaction table ********** */
         let transPayload = {
             transId: data.transId,
-            payment_mode: data.payment_mode,
+            payment_mode: data.payment_mode?data.payment_mode:null,
             paymentResponse: data.paymentResponse ? data.paymentResponse : null,
             status: 1
         };
@@ -146,6 +153,26 @@ const addToWalletPaymentCompletion =  async(data)=>{
             .where({ "orderId": data.orderId }));
         if (err) {
             throw ErrorResponse(err.message)
+        }
+        return result1
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+const walletBalance = async (userId) => {
+    try {
+        let err, result;
+        [err, result] = await to(ALPayModel.query()
+            .sum("credit_amount as Credit_amount")
+            .sum("debit_amount as Debit_amount")
+            .where({ "userId": userId })
+            .where({ "status": 1 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined) {
+            result[0]["walletBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            return result
         }
     } catch (err) {
         throw ErrorResponse(err.message)
@@ -156,5 +183,6 @@ module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
     addToWalletInitiation,
-    addToWalletPaymentCompletion
+    addToWalletPaymentCompletion,
+    walletBalance
 }

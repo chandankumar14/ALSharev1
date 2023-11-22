@@ -58,9 +58,24 @@ const userFollowersList = async (userId) => {
     }
 }
 
+const followingStatus = async (userId,followingId) => {
+    try {
+        let err, result
+        [err, result] = await to(followersFollowingRepository.followingStatus(userId,followingId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports={
     follow ,
     unFollow ,
     userFollowingList,
-    userFollowersList
+    userFollowersList,
+    followingStatus
 }

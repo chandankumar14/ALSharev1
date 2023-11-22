@@ -95,9 +95,28 @@ const userFollowersList = async (userId) => {
     }
 }
 
+const followingStatus = async (userId, followingId) => {
+    try {
+        let err, result;
+        [err, result] = await to(followingModel.query()
+            .select("*")
+            .where({ "userId": userId })
+            .where({ "followingId": followingId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+
+
 module.exports = {
     follow,
     userFollowingList,
     userFollowersList,
-    unFollow
+    unFollow,
+    followingStatus
 }

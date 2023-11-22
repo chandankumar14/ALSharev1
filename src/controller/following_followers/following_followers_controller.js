@@ -70,10 +70,29 @@ const userFollowingList = async (req, res) => {
     }
 }
 
+const followingStatus = async (req, res) => {
+    let result, err
+    let userId = req.body.userId;
+    let followingId = req.body.followingId
+    try {
+        [err, result] = await to(followersFollowingService.followingStatus(userId, followingId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "Your Following status..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 
 module.exports = {
     follow,
     unFollow,
     userFollowersList,
-    userFollowingList
+    userFollowingList,
+    followingStatus
 }

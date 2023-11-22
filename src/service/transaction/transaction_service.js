@@ -84,11 +84,41 @@ const walletTransHistoryList = async (userId) => {
     }
 }
 
+const eventBalanceTransHistory = async (userId) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.eventBalanceTransHistory(userId));
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const eventBalance = async (userId) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.eventBalance(userId));
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports ={
     eventPaymentInitiation,
     eventPaymentComplection ,
     addToWalletInitiation,
     addToWalletPaymentCompletion,
     walletBalance,
-    walletTransHistoryList
+    walletTransHistoryList,
+    eventBalanceTransHistory,
+    eventBalance
 }

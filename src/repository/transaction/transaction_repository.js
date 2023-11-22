@@ -1,6 +1,7 @@
 const transactionModel = require("../../models/transaction/transaction");
 const participants = require("../../models/events/participants");
-const ALPayModel  = require("../../models/alPay/al_pay")
+const ALPayModel  = require("../../models/wallet_feature/al_pay");
+const event_balanceModel = require("../../models/wallet_feature/event_balance");
 const moment = require("moment")
 const path = require("path")
 const razorPay = require("razorpay");
@@ -195,11 +196,48 @@ const walletTransHistoryList = async (userId) => {
     }
 }
 
+const eventBalanceTransHistory = async (userId) => {
+    try {
+        let err, result
+        [err, result] = await to(event_balanceModel.query()
+            .select("*")
+            .where({ "userId": userId })
+            .where({ "status": 1 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const eventBalance = async (userId) => {
+    try {
+        let err, result;
+        [err, result] = await to(event_balanceModel.query()
+            .sum("credit_amount as Credit_amount")
+            .sum("debit_amount as Debit_amount")
+            .where({ "userId": userId })
+            .where({ "status": 1 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined) {
+            result[0]["eventBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            return result
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
     addToWalletInitiation,
     addToWalletPaymentCompletion,
     walletBalance,
-    walletTransHistoryList
+    walletTransHistoryList,
+    eventBalanceTransHistory,
+    eventBalance
 }

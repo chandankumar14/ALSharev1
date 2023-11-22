@@ -101,7 +101,8 @@ const followingStatus = async (userId, followingId) => {
         [err, result] = await to(followingModel.query()
             .select("*")
             .where({ "userId": userId })
-            .where({ "followingId": followingId }));
+            .where({ "followingId": followingId })
+            .where({ "status": 1 }));
         if (err) {
             throw ErrorResponse(err.message)
         }

@@ -91,7 +91,7 @@ const postedContentList = async (userId) => {
             .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 }))
             .modifyGraph("user_details", (builder) => builder
-                .select("userId", "firstName", "lastName", "middleName", "email"))
+                .select("userId", "firstName", "lastName", "middleName", "email","profileImage"))
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 })
             .orderBy("contentId","DESC"))

@@ -93,7 +93,8 @@ const postedContentList = async (userId) => {
             .modifyGraph("user_details", (builder) => builder
                 .select("userId", "firstName", "lastName", "middleName", "email"))
             .where({ "contentStatus": 1 })
-            .where({ "delete": 0 }))
+            .where({ "delete": 0 })
+            .orderBy("contentId","DESC"))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -101,15 +102,16 @@ const postedContentList = async (userId) => {
             try {
                 [err, result1] = await to(followingModel.query().select("*")
                     .where({ "userId": userId })
-                    .where({ "status": 1 }))
+                    .where({ "status": 1 }));
+
                 if (result1 && result1 != undefined) {
-                    result.map(item1 => {
+                   result.map(item1 => {
                         if (result1.filter(item2 => item2?.userId === item1?.user_details?.userId).length > 0) {
-                            item1.following = 1
+                           item1.following =1;
                         }
                     })
                 }
-                return result
+               return result
             } catch (err) {
                 throw ErrorResponse(err.message)
             }

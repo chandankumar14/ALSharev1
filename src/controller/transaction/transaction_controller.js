@@ -137,6 +137,40 @@ const eventBalance = async (req, res) => {
     }
 }
 
+const joinEventFromWallet = async (req, res) => {
+    let err, result;
+    let data = req.body;
+    try {
+        [err, result] = await to(transactionService.joinEventFromWallet(data));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your are successfully join the event..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+const joinEventFromEventBalance = async (req, res) => {
+    let err, result;
+    let data = req.body;
+    try {
+        [err, result] = await to(transactionService.joinEventFromEventBalance(data));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your are successfully join the event..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 
 module.exports ={
     eventPaymentInitiation ,
@@ -146,5 +180,7 @@ module.exports ={
     walletBalance,
     walletTransHistoryList,
     eventBalanceTransHistory,
-    eventBalance
+    eventBalance,
+    joinEventFromWallet,
+    joinEventFromEventBalance
 }

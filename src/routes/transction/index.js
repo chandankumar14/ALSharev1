@@ -12,8 +12,10 @@ Router.post(`/payment_initated_to_wallet`, authMiddleware, transactionController
 Router.post(`/wallet_payment_completion`, authMiddleware, transactionController.addToWalletPaymentCompletion);
 Router.get(`/user_wallet_balance/:userId`, authMiddleware, transactionController.walletBalance);
 Router.get(`/wallet_trans_history_list/:userId`, authMiddleware, transactionController.walletTransHistoryList);
+Router.post(`/join_event_from_wallet`, authMiddleware, transactionController.joinEventFromWallet)
 //*************This is event balance feature******** */
 Router.get(`/event_balance_history/:userId`, authMiddleware, transactionController.eventBalanceTransHistory);
 Router.get(`/event_balance/:userId`, authMiddleware, transactionController.eventBalance);
+Router.post(`/join_event_from_event_balance`, authMiddleware, transactionController.joinEventFromEventBalance)
 
 module.exports = Router 

@@ -2,6 +2,7 @@ const transactionModel = require("../../models/transaction/transaction");
 const participants = require("../../models/events/participants");
 const ALPayModel  = require("../../models/wallet_feature/al_pay");
 const event_balanceModel = require("../../models/wallet_feature/event_balance");
+const crypto = require('crypto');
 const moment = require("moment")
 const path = require("path")
 const razorPay = require("razorpay");
@@ -231,6 +232,93 @@ const eventBalance = async (userId) => {
         throw ErrorResponse(err.message)
     }
 }
+
+const joinEventFromWallet = async (data) => {
+    try {
+        let err, result;
+        const Today_Date = moment().format();
+        const transId = crypto.randomBytes(16).toString('base64url');
+        const orderId = crypto.randomBytes(16).toString('hex');
+        const participantPayload = {
+            userId: data.userId,
+            eventId: data.eventId,
+            joining_date: Today_Date,
+            status: 1
+        };
+        const transPayload = {
+            userId: data.userId,
+            debit_amount: data.amount,
+            orderId: orderId,
+            currency_code: 'INR',
+            initiated: 1,
+            keyId: razorpayKeyId,
+            transId: transId,
+            status: 1,
+            payment_mode: "wallet"
+        };
+        [err, result] = await to(ALPayModel.query().insert(transPayload));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined) {
+            try {
+                let result2;
+                [err, result2] = await to(participants.query().insert(participantPayload));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result2
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+const joinEventFromEventBalance= async(data)=>{
+    try {
+        let err, result;
+        const Today_Date = moment().format();
+        const transId = crypto.randomBytes(16).toString('hex');
+        const orderId = crypto.randomBytes(16).toString('hex');
+        const participantPayload = {
+            userId: data.userId,
+            eventId: data.eventId,
+            joining_date: Today_Date,
+            status: 1
+        };
+        const transPayload = {
+            userId: data.userId,
+            debit_amount: data.amount,
+            orderId: orderId,
+            currency_code: 'INR',
+            transId: transId,
+            status: 1,
+            payment_mode: "event_balance"
+        };
+        [err, result] = await to(event_balanceModel.query().insert(transPayload));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined) {
+            try {
+                let result2;
+                [err, result2] = await to(participants.query().insert(participantPayload));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result2
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
@@ -239,5 +327,7 @@ module.exports = {
     walletBalance,
     walletTransHistoryList,
     eventBalanceTransHistory,
-    eventBalance
+    eventBalance,
+    joinEventFromWallet,
+    joinEventFromEventBalance
 }

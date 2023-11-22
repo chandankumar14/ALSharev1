@@ -106,7 +106,7 @@ const postedContentList = async (userId) => {
 
                 if (result1 && result1 != undefined) {
                    result.map(item1 => {
-                        if (result1.filter(item2 => item2?.userId === item1?.user_details?.userId).length > 0) {
+                        if (result1.filter(item2 => item2?.followingId === item1?.user_details?.userId).length > 0) {
                            item1.following =1;
                         }
                     })

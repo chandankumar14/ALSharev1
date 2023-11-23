@@ -285,6 +285,7 @@ const contentDetails = async (userId, contentId) => {
                 .where({ "contentId": contentId }))
             .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 })
+                .where({ "userId": userId })
                 .where({ "contentId": contentId }))
             .modifyGraph("user_details", (builder) => builder
                 .select("userId", "firstName", "lastName", "middleName", "email", "profileImage"))

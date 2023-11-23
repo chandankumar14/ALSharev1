@@ -155,6 +155,25 @@ const markAsFavourites = async (req, res) => {
     }
 }
 
+const removeFavouritesContent = async (req, res) => {
+    let result, err;
+    let userId = req.body.userId;
+    let contentId = req.body.contentId;
+   
+    try {
+        [err, result] = await to(contentService.removeFavouritesContent(userId,contentId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your favourites content is remove successfully....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 const userFavouritesContentList = async (req, res) => {
     let result, err
     let userId = req.params.userId
@@ -182,5 +201,6 @@ module.exports = {
     contentRating,
     contentAction,
     markAsFavourites,
-    userFavouritesContentList
+    userFavouritesContentList,
+    removeFavouritesContent
 }

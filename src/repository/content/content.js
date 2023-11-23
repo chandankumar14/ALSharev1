@@ -247,7 +247,22 @@ const userFavouritesContentList = async (userId) => {
                 builder.select("*").where({ "active": 1 }))
             .modifyGraph("content_rating_list", (builder) =>
                 builder.select("*").where({ "active": 1 }))
-            .where({ "userId": userId }));
+            .where({ "userId": userId })
+            .where({ "status": 1 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+const removeFavouritesContent = async (userId, contentId) => {
+    try {
+        let err, result;
+        [err, result] = await to(favouritesModel.query().update({ status: 0 })
+            .where({ "userId": userId })
+            .where({ "contentId": contentId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -267,5 +282,6 @@ module.exports = {
     contentAction,
     contentRating,
     markAsFavourites,
-    userFavouritesContentList
+    userFavouritesContentList,
+    removeFavouritesContent
 }

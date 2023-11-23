@@ -126,6 +126,20 @@ const markAsFavourites = async (data) => {
     }
 }
 
+const removeFavouritesContent = async (userId,contentId) => {
+    try {
+        let err, result
+        [err, result] = await to(contentRepository.removeFavouritesContent(userId,contentId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 const userFavouritesContentList = async (userId) => {
     try {
         let err, result
@@ -150,6 +164,7 @@ module.exports = {
     contentRating,
     contentAction,
     markAsFavourites,
-    userFavouritesContentList
+    userFavouritesContentList,
+    removeFavouritesContent
 
 }

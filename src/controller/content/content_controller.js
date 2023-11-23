@@ -191,6 +191,23 @@ const userFavouritesContentList = async (req, res) => {
     }
 }
 
+const contentDetails = async (req, res) => {
+    let result, err;
+    let userId = req.body.userId;
+    let contentId = req.body.contentId;
+   try {
+        [err, result] = await to(contentService.contentDetails(userId,contentId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "content details fetch successfully....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 module.exports = {
     postContent,
     postDraftcontent,
@@ -202,5 +219,6 @@ module.exports = {
     contentAction,
     markAsFavourites,
     userFavouritesContentList,
-    removeFavouritesContent
+    removeFavouritesContent,
+    contentDetails
 }

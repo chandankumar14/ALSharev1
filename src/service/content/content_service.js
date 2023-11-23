@@ -154,6 +154,20 @@ const userFavouritesContentList = async (userId) => {
     }
 }
 
+const contentDetails = async (userId, contentId) => {
+    try {
+        let err, result
+        [err, result] = await to(contentRepository.contentDetails(userId, contentId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postContent,
     postDraftcontent,
@@ -165,6 +179,7 @@ module.exports = {
     contentAction,
     markAsFavourites,
     userFavouritesContentList,
-    removeFavouritesContent
+    removeFavouritesContent,
+    contentDetails
 
 }

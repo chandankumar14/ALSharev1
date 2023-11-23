@@ -275,6 +275,36 @@ const removeFavouritesContent = async (userId, contentId) => {
     }
 }
 
+const contentDetails = async (userId, contentId) => {
+    try {
+        let err, result
+        [err, result] = await to(contentModel.query().select("*")
+            .withGraphFetched('[action,rating_list,user_details,favourites]')
+            .modifyGraph('action', (builder) => builder.select("*")
+                .where({ "active": 1 })
+                .where({ "userId": userId })
+                .where({ "contentId": contentId }))
+            .modifyGraph("rating_list", (builder) => builder.select("*")
+                .where({ "active": 1 })
+                .where({ "contentId": contentId }))
+            .modifyGraph("user_details", (builder) => builder
+                .select("userId", "firstName", "lastName", "middleName", "email", "profileImage"))
+            .modifyGraph("favourites", (builder) => builder.select("*")
+                .where({ "userId": userId })
+                .where({ "contentId": contentId })
+                .where({ "status": 1 }))
+            .where({ "contentStatus": 1 })
+            .where({ "delete": 0 })
+            .where({ "contentId": contentId }))
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postContent,
     postDraftcontent,
@@ -286,5 +316,6 @@ module.exports = {
     contentRating,
     markAsFavourites,
     userFavouritesContentList,
-    removeFavouritesContent
+    removeFavouritesContent,
+    contentDetails
 }

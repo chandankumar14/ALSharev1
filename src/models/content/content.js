@@ -7,6 +7,7 @@ class content extends Model {
     static get relationMappings() {
         const content_action = require("../content/content_action")
         const content_rating = require("../content/content_rating")
+        const favourites = require("../../models/content/favourites")
         const users = require("../users/user")
         return {
             action: {
@@ -33,6 +34,14 @@ class content extends Model {
                     to: 'users.userId'
                 }
             },
+            favourites:{
+                relation: Model.HasManyRelation,
+                modelClass: favourites,
+                join: {
+                    from: 'content.contentId',
+                    to: 'favourites.contentId'
+                } 
+            }
         }
     }
 

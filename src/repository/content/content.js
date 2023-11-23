@@ -85,16 +85,19 @@ const postedContentList = async (userId) => {
     try {
         let err, result, result1
         [err, result] = await to(contentModel.query().select("*")
-            .withGraphFetched('[action,rating_list,user_details]')
+            .withGraphFetched('[action,rating_list,user_details,favourites]')
             .modifyGraph('action', (builder) => builder.select("*")
                 .where({ "active": 1 }))
             .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 }))
             .modifyGraph("user_details", (builder) => builder
-                .select("userId", "firstName", "lastName", "middleName", "email","profileImage"))
+                .select("userId", "firstName", "lastName", "middleName", "email", "profileImage"))
+            .modifyGraph("favourites", (builder) => builder.select("*")
+                .where({ "userId": userId })
+                .where({ "status": 1 }))
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 })
-            .orderBy("contentId","DESC"))
+            .orderBy("contentId", "DESC"))
         if (err) {
             throw ErrorResponse(err.message)
         }

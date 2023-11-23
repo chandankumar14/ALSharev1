@@ -282,7 +282,6 @@ const contentDetails = async (userId, contentId) => {
             .withGraphFetched('[action,rating_list,user_details,favourites]')
             .modifyGraph('action', (builder) => builder.select("*")
                 .where({ "active": 1 })
-                .where({ "userId": userId })
                 .where({ "contentId": contentId }))
             .modifyGraph("rating_list", (builder) => builder.select("*")
                 .where({ "active": 1 })

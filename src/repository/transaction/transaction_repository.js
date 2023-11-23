@@ -60,13 +60,14 @@ const eventPaymentInitiation = async (data) => {
 const eventPaymentComplection = async (data) => {
     try {
         const Today_Date = moment().format();
-        let err, result1, result2
+        let err, result1;
+        let orderId = data.orderId;
+
         //***********updating transaction table ********** */
         const transPayload = {
             transId: data.transId,
             payment_mode: data.payment_mode?data.payment_mode:null,
-            paymentResponse: data.paymentResponse?data.paymentResponse:null,
-            status:1
+            status:1,
         };
         const participantPayload = {
             userId: data.userId,
@@ -74,19 +75,35 @@ const eventPaymentComplection = async (data) => {
             joining_date: Today_Date,
             status: 1
         };
-        [err, result1] = await to(transactionModel.query().update(transPayload)
-            .where({ "orderId": data.orderId }))
+        const eventBalancePayload = {
+            userId: data.userId,
+            credit_amount: data.amount,
+            orderId: data.orderId,
+            currency_code: 'INR',
+            transId: data.transId,
+            status: 1,
+            payment_mode: data.payment_mode?data.payment_mode:{},
+        };
+        [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId}));
         if (err) {
             throw ErrorResponse(err.message)
         }
         //**********updating participants table here ********** */
         if (result1 && result1 != undefined) {
-            try {
-                [err, result2] = await to(participants.query().insert(participantPayload))
+           try {
+                let result2;
+                [err, result2] = await to(event_balanceModel.query().insert(eventBalancePayload));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
-                return result2
+                if (result2 && result2 != undefined) {
+                    let result3;
+                    [err, result3] = await to(participants.query().insert(participantPayload));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result3
+                }
             } catch (err) {
                 throw ErrorResponse(err.message)
             }
@@ -96,7 +113,6 @@ const eventPaymentComplection = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-
 // **********Transaction  inititation for adding amount in wallet **********
 
 const addToWalletInitiation = async (data) => {
@@ -148,7 +164,6 @@ const addToWalletPaymentCompletion =  async(data)=>{
         let transPayload = {
             transId: data.transId,
             payment_mode: data.payment_mode?data.payment_mode:null,
-            paymentResponse: data.paymentResponse ? data.paymentResponse : null,
             status: 1
         };
         [err, result1] = await to(ALPayModel.query().update(transPayload)
@@ -237,7 +252,7 @@ const joinEventFromWallet = async (data) => {
     try {
         let err, result;
         const Today_Date = moment().format();
-        const transId = crypto.randomBytes(16).toString('base64url');
+        const transId = crypto.randomBytes(16).toString('hex');
         const orderId = crypto.randomBytes(16).toString('hex');
         const participantPayload = {
             userId: data.userId,
@@ -256,6 +271,15 @@ const joinEventFromWallet = async (data) => {
             status: 1,
             payment_mode: "wallet"
         };
+        const eventBalancePayload = {
+            userId: data.userId,
+            credit_amount: data.amount,
+            orderId: orderId,
+            currency_code: 'INR',
+            transId: transId,
+            status: 1,
+            payment_mode: "wallet"
+        };
         [err, result] = await to(ALPayModel.query().insert(transPayload));
         if (err) {
             throw ErrorResponse(err.message)
@@ -263,11 +287,22 @@ const joinEventFromWallet = async (data) => {
         if (result && result != undefined) {
             try {
                 let result2;
-                [err, result2] = await to(participants.query().insert(participantPayload));
+                [err, result2] = await to(event_balanceModel.query().insert(eventBalancePayload));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
-                return result2
+                if (result2 && result2 != undefined) {
+                    try {
+                        let err, result3
+                        [err, result3] = await to(participants.query().insert(participantPayload));
+                        if (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                        return result3
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                }
             } catch (err) {
                 throw ErrorResponse(err.message)
             }

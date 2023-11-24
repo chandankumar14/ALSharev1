@@ -257,6 +257,32 @@ const eventContentRating = async (data) => {
     }
 }
 
+const eventContentDetails = async (userId, contentId) => {
+    try {
+        let err, result
+        [err, result] = await to(eventContentModel.query().select("*")
+            .withGraphFetched('[action,rating_list,user_details]')
+            .modifyGraph('action', (builder) => builder.select("*")
+                .where({ "active": 1 })
+                .where({ "contentId": contentId }))
+            .modifyGraph("rating_list", (builder) => builder.select("*")
+                .where({ "active": 1 })
+                .where({ "userId": userId })
+                .where({ "contentId": contentId }))
+            .modifyGraph("user_details", (builder) => builder
+                .select("userId", "firstName", "profileImage"))
+            .where({ "contentStatus": 1 })
+            .where({ "delete": 0 })
+            .where({ "contentId": contentId }))
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postEventContent,
     postDraftEventContent,
@@ -265,5 +291,6 @@ module.exports = {
     userDfratEventContent,
     userPostedEventContent,
     eventContentRating,
-    eventContentAction
+    eventContentAction,
+    eventContentDetails
 }

@@ -112,6 +112,20 @@ const eventContentAction = async (data) => {
     }
 }
 
+const eventContentDetails = async (userId, contentId) => {
+    try {
+        let err, result
+        [err, result] = await to(eventContentRepository.eventContentDetails(userId, contentId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postEventContent,
     postDraftEventContent,
@@ -120,5 +134,6 @@ module.exports = {
     userPostedEventContent,
     eventContentList,
     eventContentRating,
-    eventContentAction
+    eventContentAction,
+    eventContentDetails
 }

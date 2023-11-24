@@ -15,7 +15,7 @@ class eventContent extends Model {
                     to: 'event_content_action.contentId'
                 }
             },
-            rating: {
+            rating_list: {
                 relation: Model.HasManyRelation,
                 modelClass: event_content_rating,
                 join: {

@@ -124,60 +124,6 @@ const postedContentList = async (userId) => {
     }
 }
 
-//**********Rating functionality is here ********** */
-const contentRating = async (data) => {
-    try {
-        let err, result2, result3, result4, finalValue
-        const payload = {
-            contentId: data.contentId,
-            rating: data.current,
-            userId: data.userId,
-            active: 1
-        }
-        finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.current - data.last)) / data.userCount).toFixed(2))
-        // ***********event content rating seaction *********
-        const result1 = await to(contentModel.query()
-            .update({ rating: finalValue, userCount: data.userCount })
-            .where({ "contentId": data.contentId }));
-        if (result1 && result1 != undefined) {
-            try {
-                if (data.firstTime) {
-                    try {
-                        [err, result2] = await to(contentRatingModel.query().insert(payload));
-                        if (err) {
-                            throw ErrorResponse(err.message)
-                        }
-                        return result2
-                    } catch (err) {
-                        throw ErrorResponse(err.message)
-                    }
-                } else {
-                    [err, result3] = await to(contentRatingModel.query()
-                        .update({ active: 0 })
-                        .where({ "actionId": data.actionId }));
-                    if (err) {
-                        throw ErrorResponse(err.message)
-                    }
-                    if (result3 && result3 != undefined) {
-                        try {
-                            [err, result4] = await to(contentRatingModel.query().insert(payload));
-                            if (err) {
-                                throw ErrorResponse(err.message)
-                            }
-                            return result4
-                        } catch (err) {
-                            throw ErrorResponse(err.message)
-                        }
-                    }
-                }
-            } catch (err) {
-                throw ErrorResponse(err.message)
-            }
-        }
-    } catch (err) {
-        throw ErrorResponse(err.message)
-    }
-}
 //**********Action functionality is here *************like reacting */
 const contentAction = async (data) => {
     try {
@@ -188,33 +134,43 @@ const contentAction = async (data) => {
             typeId: data.typeId,
             name: data.name,
             value: data.value,
+        };
+        [err, result2] = await to(contentActionModel
+            .query().select("contentId", "userId")
+            .where({ "active": 1 })
+            .where({ "userId": data.userId })
+            .where({ "contentId": data.contentId }));
+        if (err) {
+            throw ErrorResponse(err.message)
         }
-        if (data.firstTime) {
-            [err, result2] = await to(contentActionModel.query().insert(payload))
+        if (result2 && result2.length > 0) {
+            [err, result3] = await to(contentActionModel.query()
+                .update({ active: 0 })
+                .where({ "userId": data.userId })
+                .where({ "contentId": data.contentId }));
             if (err) {
                 throw ErrorResponse(err.message)
             }
-            return result2
+            if (result3 && result3 != undefined) {
+                try {
+                    let result5;
+                    [err, result5] = await to(contentActionModel.query().insert(payload));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result5
+                } catch (err) {
+                    throw ErrorResponse(err.message)
+                }
+            }
         } else {
             try {
-                [err, result2] = await to(contentActionModel.query()
-                    .update({ active: 0 })
-                    .where({ "actionId": data.actionId }));
+                let result4;
+                [err, result4] = await to(contentActionModel.query().insert(payload));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
-                if (result2 && result2 != undefined) {
-                    try {
-                        [err, result3] = await to(contentActionModel.query().insert(payload))
-                        if (err) {
-                            throw ErrorResponse(err.message)
-                        }
-                        return result3
-                    } catch (err) {
-                        throw ErrorResponse(err.message)
-                    }
-                }
-
+                return result4
             } catch (err) {
                 throw ErrorResponse(err.message)
             }
@@ -281,6 +237,8 @@ const contentDetails = async (userId, contentId) => {
         [err, result] = await to(contentModel.query().select("*")
             .withGraphFetched('[action,rating_list,user_details,favourites]')
             .modifyGraph('action', (builder) => builder.select("*")
+                // .count("typeId")
+                // .groupBy("typeId")
                 .where({ "active": 1 })
                 .where({ "contentId": contentId }))
             .modifyGraph("rating_list", (builder) => builder.select("*")
@@ -305,6 +263,109 @@ const contentDetails = async (userId, contentId) => {
     }
 }
 
+const contentRating = async (data) => {
+    try {
+        let result, err;
+        [err, result] = await to(contentModel.query()
+            .select("contentId", "rating", "userCount")
+            .withGraphFetched('[rating_list]')
+            .modifyGraph("rating_list", (builder) => builder.select("rating")
+                .where({ "active": 1 })
+                .where({ "userId": data.userId })
+                .where({ "contentId": data.contentId }))
+            .where({ "contentId": data.contentId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined) {
+            if (result[0].rating_list.length > 0) {
+                let rating = result[0].rating === null ? 0.0 : result[0].rating;
+                let userCount = result[0].userCount === null ? 0 : result[0].userCount;
+                let userRating = result[0].rating_list[0].rating;
+                let finalValue = ((rating * userCount) + (data.rating - userRating)) / userCount;
+                console.log(finalValue)
+                try {
+                    let result2;
+                    [err, result2] = await to(contentModel.query().update({ rating: finalValue })
+                        .where({ "contentId": data.contentId }));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    if (result2 && result2 != undefined) {
+                        try {
+                            let result3;
+                            [err, result3] = await to(contentRatingModel.query()
+                                .update({ active: 0 })
+                                .where({ "contentId": data.contentId })
+                                .where({ "userId": data.userId })
+                                .where({ "active": 1 }));
+                            if (err) {
+                                throw ErrorResponse(err.message)
+                            }
+                            if (result3 && result3 != undefined) {
+                                try {
+                                    let result4;
+                                    let payload = {
+                                        userId: data.userId,
+                                        contentId: data.contentId,
+                                        rating: data.rating,
+                                        active: 1
+                                    };
+                                    [err, result4] = await to(contentRatingModel.query().insert(payload));
+                                    if (err) {
+                                        throw ErrorResponse(err.message)
+                                    }
+                                    return result4
+                                } catch (err) {
+                                    throw ErrorResponse(err.message)
+                                }
+                            }
+                        } catch (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                    }
+                } catch (err) {
+                    throw ErrorResponse(err.message)
+                }
+            } else {
+                let rating = result[0].rating === null ? 0.0 : result[0].rating;
+                let userCount = result[0].userCount === null ? 0 : result[0].userCount;
+                let finalValue = ((rating * userCount) + (data.rating)) / (userCount + 1);
+                let result5;
+                [err, result5] = await to(contentModel.query()
+                    .update({
+                        rating: finalValue,
+                        userCount: userCount + 1
+                    })
+                    .where({ "contentId": data.contentId }));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                if (result5 && result5 != undefined) {
+                    try {
+                        let result6;
+                        let payload = {
+                            userId: data.userId,
+                            contentId: data.contentId,
+                            rating: data.rating,
+                            active: 1
+                        };
+                        [err, result6] = await to(contentRatingModel.query().insert(payload));
+                        if (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                        return result6
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     postContent,
     postDraftcontent,
@@ -317,5 +378,6 @@ module.exports = {
     markAsFavourites,
     userFavouritesContentList,
     removeFavouritesContent,
-    contentDetails
+    contentDetails,
+   
 }

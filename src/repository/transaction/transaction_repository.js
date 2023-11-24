@@ -1,6 +1,6 @@
 const transactionModel = require("../../models/transaction/transaction");
 const participants = require("../../models/events/participants");
-const ALPayModel  = require("../../models/wallet_feature/al_pay");
+const ALPayModel = require("../../models/wallet_feature/al_pay");
 const event_balanceModel = require("../../models/wallet_feature/event_balance");
 const crypto = require('crypto');
 const moment = require("moment")
@@ -29,7 +29,7 @@ const eventPaymentInitiation = async (data) => {
             }
         }
         // ************creating order for payment ************
-        const razorPayOrder= await razorPayInstance.orders.create(payload1);
+        const razorPayOrder = await razorPayInstance.orders.create(payload1);
         // **********updating transaction_history_table **************
         if (razorPayOrder && razorPayOrder != undefined) {
             try {
@@ -42,7 +42,7 @@ const eventPaymentInitiation = async (data) => {
                     initiated: true,
                     keyId: razorpayKeyId
                 };
-               [err, transaction_history] = await to(transactionModel.query().insert(payload))
+                [err, transaction_history] = await to(transactionModel.query().insert(payload))
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
@@ -62,12 +62,11 @@ const eventPaymentComplection = async (data) => {
         const Today_Date = moment().format();
         let err, result1;
         let orderId = data.orderId;
-
         //***********updating transaction table ********** */
         const transPayload = {
             transId: data.transId,
-            payment_mode: data.payment_mode?data.payment_mode:null,
-            status:1,
+            payment_mode: data.payment_mode ? data.payment_mode : null,
+            status: 1,
         };
         const participantPayload = {
             userId: data.userId,
@@ -75,28 +74,14 @@ const eventPaymentComplection = async (data) => {
             joining_date: Today_Date,
             status: 1
         };
-        const eventBalancePayload = {
-            userId: data.userId,
-            credit_amount: data.amount,
-            orderId: data.orderId,
-            currency_code: 'INR',
-            transId: data.transId,
-            status: 1,
-            payment_mode: data.payment_mode?data.payment_mode:{},
-        };
-        [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId}));
+        [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
         //**********updating participants table here ********** */
         if (result1 && result1 != undefined) {
-           try {
-                let result2;
-                [err, result2] = await to(event_balanceModel.query().insert(eventBalancePayload));
-                if (err) {
-                    throw ErrorResponse(err.message)
-                }
-                if (result2 && result2 != undefined) {
+            try {
+                if (result1 && result1 != undefined) {
                     let result3;
                     [err, result3] = await to(participants.query().insert(participantPayload));
                     if (err) {
@@ -108,7 +93,6 @@ const eventPaymentComplection = async (data) => {
                 throw ErrorResponse(err.message)
             }
         }
-
     } catch (err) {
         throw ErrorResponse(err.message)
     }
@@ -125,7 +109,7 @@ const addToWalletInitiation = async (data) => {
         var payload1 = {
             amount: data.amount * 100,  // amount in the smallest currency unit
             currency: "INR",
-            receipt: data.email?data.email:null,
+            receipt: data.email ? data.email : null,
             notes: {
                 userId: data.userId,
                 message: "creating order Id for adding balance in ALPay.."
@@ -157,13 +141,13 @@ const addToWalletInitiation = async (data) => {
     }
 }
 
-const addToWalletPaymentCompletion =  async(data)=>{
+const addToWalletPaymentCompletion = async (data) => {
     try {
         let err, result1
         //***********updating transaction table ********** */
         let transPayload = {
             transId: data.transId,
-            payment_mode: data.payment_mode?data.payment_mode:null,
+            payment_mode: data.payment_mode ? data.payment_mode : null,
             status: 1
         };
         [err, result1] = await to(ALPayModel.query().update(transPayload)
@@ -271,48 +255,29 @@ const joinEventFromWallet = async (data) => {
             status: 1,
             payment_mode: "wallet"
         };
-        const eventBalancePayload = {
-            userId: data.userId,
-            credit_amount: data.amount,
-            orderId: orderId,
-            currency_code: 'INR',
-            transId: transId,
-            status: 1,
-            payment_mode: "wallet"
-        };
         [err, result] = await to(ALPayModel.query().insert(transPayload));
         if (err) {
             throw ErrorResponse(err.message)
         }
         if (result && result != undefined) {
             try {
-                let result2;
-                [err, result2] = await to(event_balanceModel.query().insert(eventBalancePayload));
+                let err, result3
+                [err, result3] = await to(participants.query().insert(participantPayload));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
-                if (result2 && result2 != undefined) {
-                    try {
-                        let err, result3
-                        [err, result3] = await to(participants.query().insert(participantPayload));
-                        if (err) {
-                            throw ErrorResponse(err.message)
-                        }
-                        return result3
-                    } catch (err) {
-                        throw ErrorResponse(err.message)
-                    }
-                }
+                return result3
             } catch (err) {
                 throw ErrorResponse(err.message)
             }
         }
+
     } catch (err) {
         throw ErrorResponse(err.message)
     }
 }
 
-const joinEventFromEventBalance= async(data)=>{
+const joinEventFromEventBalance = async (data) => {
     try {
         let err, result;
         const Today_Date = moment().format();

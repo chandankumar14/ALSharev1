@@ -180,6 +180,7 @@ module.exports = {
     markAsFavourites,
     userFavouritesContentList,
     removeFavouritesContent,
-    contentDetails
+    contentDetails,
+    
 
 }

@@ -49,7 +49,7 @@ const eventContentList = async (eventId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .withGraphFetched('[action,rating]')
+            .withGraphFetched('[action,rating_list]')
             .modifyGraph('action', (builder) => builder.select("*")
                 .where({ "active": 1 }))
             .modifyGraph("rating", (builder) => builder.select("*")
@@ -100,51 +100,52 @@ const userPostedEventContent = async (userId) => {
     }
 }
 
-const eventContentRating = async (data) => {
+const eventContentAction = async (data) => {
     try {
-        let err, result1, result2, result3
+        let err, result2, result3
         const payload = {
-            contentId: data.contentId,
-            rating: data.current,
             userId: data.userId,
-            active: 1
-        }
-        const finalValue = Number(parseFloat(((data.rating * data.userCount) + (data.last - data.current)) / data.userCount).toFixed(2))
-        // ***********event content rating seaction *********
-        [err, result1] = await to(eventContentModel.query()
-            .update({ rating: finalValue, userCount: userCount })
-            .where({ "contentId": data.contentId }))
+            contentId: data.contentId,
+            typeId: data.typeId,
+            name: data.name,
+            value: data.value,
+        };
+        [err, result2] = await to(eventContentActionModel
+            .query().select("contentId", "userId")
+            .where({ "active": 1 })
+            .where({ "userId": data.userId })
+            .where({ "contentId": data.contentId }));
         if (err) {
             throw ErrorResponse(err.message)
         }
-        if (result1 && result1 != undefined) {
-            try {
-                if (data.firstTime) {
-                    [err, result2] = await to(eventContentRatingModel.query().insert(payload))
+        if (result2 && result2.length > 0) {
+            [err, result3] = await to(eventContentActionModel.query()
+                .update({ active: 0 })
+                .where({ "userId": data.userId })
+                .where({ "contentId": data.contentId }));
+            if (err) {
+                throw ErrorResponse(err.message)
+            }
+            if (result3 && result3 != undefined) {
+                try {
+                    let result5;
+                    [err, result5] = await to(eventContentActionModel.query().insert(payload));
                     if (err) {
                         throw ErrorResponse(err.message)
                     }
-                    return result2
-                } else {
-                    [err, result2] = await to(eventContentRatingModel.query()
-                        .update({ active: 0 })
-                        .where({ "actionId": data.actionId }))
-                    if (err) {
-                        throw ErrorResponse(err.message)
-                    }
-                    if (result2 && result2 != undefined) {
-                        try {
-                            [err, result3] = await to(eventContentRatingModel.query().insert(payload));
-                            if (err) {
-                                throw ErrorResponse(err.message)
-                            }
-                            return result3
-                        } catch (err) {
-                            throw ErrorResponse(err.message)
-                        }
-                    }
+                    return result5
+                } catch (err) {
+                    throw ErrorResponse(err.message)
                 }
-
+            }
+        } else {
+            try {
+                let result4;
+                [err, result4] = await to(eventContentActionModel.query().insert(payload));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result4
             } catch (err) {
                 throw ErrorResponse(err.message)
             }
@@ -153,47 +154,110 @@ const eventContentRating = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-const eventContentAction = async (data) => {
+
+
+const eventContentRating = async (data) => {
     try {
-        let err, result2, result3
-        const payload = {
-            userId: data.userId,
-            contentId: data.contentId,
-            eventId: data.eventId,
-            typeId: data.typeId,
-            name: data.name,
-            value: data.value,
+        let result, err;
+        [err, result] = await to(eventContentModel.query()
+            .select("contentId", "rating", "userCount")
+            .withGraphFetched('[rating_list]')
+            .modifyGraph("rating_list", (builder) => builder.select("rating")
+                .where({ "active": 1 })
+                .where({ "userId": data.userId })
+                .where({ "contentId": data.contentId }))
+            .where({ "contentId": data.contentId }));
+        if (err) {
+            throw ErrorResponse(err.message)
         }
-        if (data.firstTime) {
-            [err, result2] = await to(eventContentActionModel.query().insert(payload))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            return result2
-        } else {
-            [err, result2] = await to(eventContentActionModel.query()
-                .update({ active: 0 })
-                .where({ "actionId": data.actionId }))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            if (result2 && result2 != undefined) {
-                try {
-                    [err, result3] = await to(eventContentActionModel.query().insert(payload))
+        if (result && result != undefined) {
+            if (result[0].rating_list.length > 0) {
+                let rating = result[0].rating === null ? 0.0 : result[0].rating;
+                let userCount = result[0].userCount === null ? 0 : result[0].userCount;
+                let userRating = result[0].rating_list[0].rating;
+                let finalValue = ((rating * userCount) + (data.rating - userRating)) / userCount;
+               try {
+                    let result2;
+                    [err, result2] = await to(eventContentModel.query().update({ rating: finalValue })
+                        .where({ "contentId": data.contentId }));
                     if (err) {
                         throw ErrorResponse(err.message)
                     }
-                    return result3
+                    if (result2 && result2 != undefined) {
+                        try {
+                            let result3;
+                            [err, result3] = await to(eventContentRatingModel.query()
+                                .update({ active: 0 })
+                                .where({ "contentId": data.contentId })
+                                .where({ "userId": data.userId })
+                                .where({ "active": 1 }));
+                            if (err) {
+                                throw ErrorResponse(err.message)
+                            }
+                            if (result3 && result3 != undefined) {
+                                try {
+                                    let result4;
+                                    let payload = {
+                                        userId: data.userId,
+                                        contentId: data.contentId,
+                                        rating: data.rating,
+                                        active: 1
+                                    };
+                                    [err, result4] = await to(eventContentRatingModel.query().insert(payload));
+                                    if (err) {
+                                        throw ErrorResponse(err.message)
+                                    }
+                                    return result4
+                                } catch (err) {
+                                    throw ErrorResponse(err.message)
+                                }
+                            }
+                        } catch (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                    }
                 } catch (err) {
                     throw ErrorResponse(err.message)
                 }
+            } else {
+                let rating = result[0].rating === null ? 0.0 : result[0].rating;
+                let userCount = result[0].userCount === null ? 0 : result[0].userCount;
+                let finalValue = ((rating * userCount) + (data.rating)) / (userCount + 1);
+                let result5;
+                [err, result5] = await to(eventContentModel.query()
+                    .update({
+                        rating: finalValue,
+                        userCount: userCount + 1
+                    })
+                    .where({ "contentId": data.contentId }));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                if (result5 && result5 != undefined) {
+                    try {
+                        let result6;
+                        let payload = {
+                            userId: data.userId,
+                            contentId: data.contentId,
+                            rating: data.rating,
+                            active: 1
+                        };
+                        [err, result6] = await to(eventContentRatingModel.query().insert(payload));
+                        if (err) {
+                            throw ErrorResponse(err.message)
+                        }
+                        return result6
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                }
             }
         }
-
     } catch (err) {
         throw ErrorResponse(err.message)
     }
 }
+
 module.exports = {
     postEventContent,
     postDraftEventContent,

@@ -49,11 +49,10 @@ const eventContentList = async (eventId) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query().select("*")
-            .withGraphFetched('[action,rating_list]')
+            .withGraphFetched('[action,user_details]')
             .modifyGraph('action', (builder) => builder.select("*")
                 .where({ "active": 1 }))
-            .modifyGraph("rating", (builder) => builder.select("*")
-                .where({ "active": 1 }))
+            .modifyGraph("user_details", (builder) => builder.select("userId", "firstName", "profileImage"))
             .where({ "eventId": eventId })
             .where({ "status": 1 })
             .where({ "delete": 0 }))

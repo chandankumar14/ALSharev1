@@ -85,7 +85,7 @@ const postedContentList = async (userId,pageNo) => {
     try {
         let err, result, result1
         [err, result] = await to(contentModel.query()
-            .select("contentId","originalSourcePath","thumbnail","duration","rating","following","created_at")
+            .select("contentId","originalSourcePath","thumbnail","duration","rating","following","contentStatus","created_at")
             .withGraphFetched('[user_details,favourites]')
             // .modifyGraph('action', (builder) => builder.select("*")
             //     .where({ "active": 1 }))

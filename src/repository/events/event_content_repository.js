@@ -48,14 +48,17 @@ const deleteEventContent = async (contentId) => {
 const eventContentList = async (eventId) => {
     try {
         let err, result
-        [err, result] = await to(eventContentModel.query().select("*")
-            .withGraphFetched('[action,user_details]')
-            .modifyGraph('action', (builder) => builder.select("*")
-                .where({ "active": 1 }))
-            .modifyGraph("user_details", (builder) => builder.select("userId", "firstName", "profileImage"))
+        [err, result] = await to(eventContentModel.query()
+            .select("contentId", "originalSourcePath", "thumbnail",
+                "duration", "rating", "contentStatus", "created_at")
+            .withGraphFetched('[user_details]')
+            .modifyGraph("user_details", (builder) =>
+                builder.select("userId", "firstName", "profileImage"))
             .where({ "eventId": eventId })
             .where({ "status": 1 })
-            .where({ "delete": 0 }))
+            .where({ "delete": 0 })
+            .orderBy("rating", "DESC"))
+            
         if (err) {
             throw ErrorResponse(err.message)
         }

@@ -18,7 +18,7 @@ Router.get(`/delete_event_content/:contentId`, authMiddleware, eventContentcontr
 Router.put(`/post_draft_event_content`, authMiddleware, eventContentcontroller.postDraftEventContent)
 Router.get(`/user_posted_event_content_list/:userId`, authMiddleware, eventContentcontroller.userPostedEventContent)
 Router.get(`/user_draft_event_content_list/:userId`, authMiddleware, eventContentcontroller.userDfratEventContent)
-Router.get(`/posted_event_content_list/:eventId`, authMiddleware, eventContentcontroller.eventContentList)
+Router.get(`/posted_event_content_list`, authMiddleware, eventContentcontroller.eventContentList)
 Router.post(`/event_content_rating`, authMiddleware, eventContentcontroller.eventContentRating)
 Router.post(`/event_content_action`, authMiddleware, eventContentcontroller.eventContentAction)
 Router.post(`/event_content_details`, authMiddleware, eventContentcontroller.eventContentDetails)

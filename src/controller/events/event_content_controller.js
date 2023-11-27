@@ -90,7 +90,7 @@ const userPostedEventContent = async (req, res) => {
 
 const eventContentList = async (req, res) => {
     let result, err
-    let eventId= req.params.eventId
+    let eventId= req.query.eventId
     try {
         [err, result] = await to(eventContentService.eventContentList(eventId))
         if (err) {

@@ -81,23 +81,25 @@ const deletePostedContent = async (contentId, userId) => {
 }
 
 // ********All posted content list ***********
-const postedContentList = async (userId) => {
+const postedContentList = async (userId,pageNo) => {
     try {
         let err, result, result1
-        [err, result] = await to(contentModel.query().select("*")
-            .withGraphFetched('[action,rating_list,user_details,favourites]')
-            .modifyGraph('action', (builder) => builder.select("*")
-                .where({ "active": 1 }))
-            .modifyGraph("rating_list", (builder) => builder.select("*")
-                .where({ "active": 1 }))
+        [err, result] = await to(contentModel.query()
+            .select("contentId","originalSourcePath","thumbnail","duration","rating","following","created_at")
+            .withGraphFetched('[user_details,favourites]')
+            // .modifyGraph('action', (builder) => builder.select("*")
+            //     .where({ "active": 1 }))
+            // .modifyGraph("rating_list", (builder) => builder.select("*")
+            //     .where({ "active": 1 }))
             .modifyGraph("user_details", (builder) => builder
-                .select("userId", "firstName", "lastName", "middleName", "email", "profileImage"))
-            .modifyGraph("favourites", (builder) => builder.select("*")
+                .select("userId", "firstName", "profileImage"))
+            .modifyGraph("favourites", (builder) => builder.select("userId","contentId")
                 .where({ "userId": userId })
                 .where({ "status": 1 }))
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 })
-            .orderBy("contentId", "DESC"))
+            .limit(pageNo*10)
+            .orderBy("rating", "DESC"))
         if (err) {
             throw ErrorResponse(err.message)
         }

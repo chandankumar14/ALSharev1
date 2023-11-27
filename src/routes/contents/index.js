@@ -9,7 +9,7 @@ Router.put(`/post_draft_content`, authMiddleware, contentController.postDraftcon
 Router.get(`/user_posted_content_list/:userId`, authMiddleware, contentController.userPostedContentList)
 Router.get(`/user_draft_content_list/:userId`, authMiddleware, contentController.userDraftContentList)
 Router.delete(`/delete_posted_content`, authMiddleware, contentController.deletePostedContent)
-Router.get(`/posted_content_list/:userId`, contentController.postedContentList)
+Router.get(`/posted_content_list`, contentController.postedContentList)
 Router.post(`/content_rating`, authMiddleware, contentController.contentRating)
 Router.post(`/content_action`, authMiddleware, contentController.contentAction)
 Router.post(`/mark_favourites`, authMiddleware, contentController.markAsFavourites)

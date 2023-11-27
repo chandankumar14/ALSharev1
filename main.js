@@ -47,3 +47,7 @@ App.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 const server = App.listen(PORT_NO, () => {
     console.log(`Server running at http://${HOST_NO}:${server.address().port}/`);
 });
+
+// ***********configuration for cron_job to update event balance***********
+
+const  fork  = require("child_process");

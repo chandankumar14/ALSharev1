@@ -70,10 +70,10 @@ const deletePostedContent = async (contentId,userId) => {
     }
 }
 
-const postedContentList = async (userId) => {
+const postedContentList = async (userId,pageNo) => {
     try {
         let err, result
-        [err, result] = await to(contentRepository.postedContentList(userId))
+        [err, result] = await to(contentRepository.postedContentList(userId,pageNo))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

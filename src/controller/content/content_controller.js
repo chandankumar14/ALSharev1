@@ -89,9 +89,10 @@ const deletePostedContent = async (req, res) => {
 
 const postedContentList = async (req, res) => {
     let result,err
-    let userId = req.params.userId
+    let userId = req.query.userId;
+    let pageNo = req.query.pageNo ? req.query.pageNo : 0;
    try {
-        [err, result] = await to(contentService.postedContentList(userId))
+        [err, result] = await to(contentService.postedContentList(userId,pageNo))
         if (err) {
             throw badRequestError(err.message)
         }

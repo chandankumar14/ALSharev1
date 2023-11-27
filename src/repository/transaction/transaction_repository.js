@@ -67,6 +67,9 @@ const eventPaymentComplection = async (data) => {
             transId: data.transId,
             payment_mode: data.payment_mode ? data.payment_mode : null,
             status: 1,
+            for_event:1,
+            event_balance_status:1
+
         };
         const participantPayload = {
             userId: data.userId,
@@ -253,7 +256,9 @@ const joinEventFromWallet = async (data) => {
             keyId: razorpayKeyId,
             transId: transId,
             status: 1,
-            payment_mode: "wallet"
+            payment_mode: "wallet",
+            for_event:1,
+            event_balance_status:1
         };
         [err, result] = await to(ALPayModel.query().insert(transPayload));
         if (err) {

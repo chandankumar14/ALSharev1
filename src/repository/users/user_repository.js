@@ -1,4 +1,5 @@
 const userModel = require("../../models/users/user")
+const participantsModel = require("../../models/events/participants")
 const common = require("../../../utilities/common")
 const msg = require("../../../utilities/msg")
 const jwt = require("jsonwebtoken");
@@ -218,9 +219,29 @@ const user_details = async (userId) => {
         throw ErrorResponse(err.message)
     }
 }
+const userParticipantsEventList = async (userId) => {
+    try {
+        let err, result;
+       [err, result] = await to(participantsModel.query()
+            .select("*")
+            .withGraphFetched('[join_event_list]')
+            .modifyGraph("join_event_list", (builder) =>
+                builder.select("*")
+                    .where({ "delete": 0 }))
+            .where({ "userId": userId }))
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
-    user_details
+    user_details,
+    userParticipantsEventList
 }

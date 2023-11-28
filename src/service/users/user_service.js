@@ -51,9 +51,23 @@ const user_details = async (userId) => {
     }
 }
 
+const userParticipantsEventList = async (userId) => {
+    let err, result
+    try {
+        [err, result] = await to(userRepository.userParticipantsEventList(userId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
-    user_details
+    user_details,
+    userParticipantsEventList
 }

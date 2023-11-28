@@ -56,6 +56,13 @@ const postedEventListByUserId = async (userId) => {
         const Today_Date = moment().format();
         let err, result
         [err, result] = await to(eventModel.query().select("*")
+            .withGraphFetched('[participant]')
+            .modifyGraph("participant", (builder) =>
+                builder.join("users", "users.userId", "participants.userId")
+                    .select("participants.userId", "participants.eventId",
+                        "participants.joining_date", "participants.status",
+                        "firstName", "profileImage")
+                    .where({ "status": 1 }))
             .where({ "userId": userId })
             .where({ "event_status": 1 })
             .where("end_date", ">=", Today_Date))

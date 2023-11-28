@@ -80,9 +80,27 @@ const user_details = async (req, res) => {
     }
 }
 
+const userParticipantsEventList = async (req, res) => {
+    let result, err;
+    let userId = req.query.userId;
+   try {
+        [err, result] = await to(userService.userParticipantsEventList(userId))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "your all join event list details fetch successfully");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
-    user_details
+    user_details,
+    userParticipantsEventList
 }

@@ -75,7 +75,8 @@ const eventPaymentComplection = async (data) => {
             userId: data.userId,
             eventId: data.eventId,
             joining_date: Today_Date,
-            status: 1
+            status: 1,
+            event_owner_Id:data.event_owner_Id
         };
         [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId }));
         if (err) {
@@ -245,7 +246,8 @@ const joinEventFromWallet = async (data) => {
             userId: data.userId,
             eventId: data.eventId,
             joining_date: Today_Date,
-            status: 1
+            status: 1,
+            event_owner_Id:data.event_owner_Id
         };
         const transPayload = {
             userId: data.userId,
@@ -292,7 +294,8 @@ const joinEventFromEventBalance = async (data) => {
             userId: data.userId,
             eventId: data.eventId,
             joining_date: Today_Date,
-            status: 1
+            status: 1,
+            event_owner_Id:data.event_owner_Id
         };
         const transPayload = {
             userId: data.userId,

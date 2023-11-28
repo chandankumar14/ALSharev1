@@ -222,12 +222,14 @@ const user_details = async (userId) => {
 const userParticipantsEventList = async (userId) => {
     try {
         let err, result;
-       [err, result] = await to(participantsModel.query()
+        [err, result] = await to(participantsModel.query()
             .select("*")
-            .withGraphFetched('[join_event_list]')
+            .withGraphFetched('[join_event_list,event_owner_details]')
             .modifyGraph("join_event_list", (builder) =>
                 builder.select("*")
                     .where({ "delete": 0 }))
+            .modifyGraph("event_owner_details", (builder) =>
+                builder.select("userId", "firstName", "profileImage"))
             .where({ "userId": userId }))
         if (err) {
             throw ErrorResponse(err.message)

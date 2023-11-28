@@ -49,5 +49,9 @@ const server = App.listen(PORT_NO, () => {
 });
 
 // ***********configuration for cron_job to update event balance***********
-
-const  fork  = require("child_process");
+const { fork } = require('child_process');
+const forked = fork("./cronjob/index");
+forked.on('message', (msg) => {
+    console.log('Message from child', msg);
+});
+forked.send('start')

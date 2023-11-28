@@ -226,8 +226,7 @@ const userParticipantsEventList = async (userId) => {
             .select("*")
             .withGraphFetched('[join_event_list,event_owner_details]')
             .modifyGraph("join_event_list", (builder) =>
-                builder.select("*")
-                    .where({ "delete": 0 }))
+                builder.select("*").where({ "delete": 0 }))
             .modifyGraph("event_owner_details", (builder) =>
                 builder.select("userId", "firstName", "profileImage"))
             .where({ "userId": userId }))

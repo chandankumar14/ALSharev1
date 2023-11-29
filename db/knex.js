@@ -30,10 +30,10 @@ module.exports = {
             directory: "../db/seeds"
         },
         connection: {
-            host: process.env.DB_HOST, //staging.host
-            user: process.env.DB_USER, //staging.username
-            password: process.env.DB_PASSWORD, //staging.password
-            database: process.env.DB_NAME    //staging.database
+            host: process.env.DB_STAGING_HOST, //staging.host
+            user: process.env.DB_STAGING_USER, //staging.username
+            password: process.env.DB_STAGING_PASSWORD, //staging.password
+            database: process.env.DB_STAGING_NAME    //staging.database
         },
         migrations: {
             tableName: 'knex_migrations'
@@ -50,10 +50,10 @@ module.exports = {
             directory: "../db/seeds"
         },
         connection: {
-            host: process.env.DB_HOST, //production.host
-            user: process.env.DB_USER, //production.username
-            password: process.env.DB_PASSWORD, //production.password
-            database: process.env.DB_NAME    //production.database
+            host: process.env.DB_PRODUCTION_HOST, //production.host
+            user: process.env.DB_PRODUCTION_USER, //production.username
+            password: process.env.DB_PRODUCTION_PASSWORD, //production.password
+            database: process.env.DB_PRODUCTION_NAME    //production.database
         },
         migrations: {
             tableName: 'knex_migrations'

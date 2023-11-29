@@ -30,10 +30,10 @@ module.exports = {
             directory: "../db/seeds"
         },
         connection: {
-            host: process.env.DB_STAGING_NAME, //staging.host
+            host: process.env.DB_STAGING_HOST, //staging.host
             user: process.env.DB_STAGING_USER, //staging.username
             password: process.env.DB_STAGING_PASSWORD, //staging.password
-            database: process.env.DB_STAGING_HOST    //staging.database
+            database: process.env.DB_STAGING_NAME    //staging.database
         },
         migrations: {
             tableName: 'knex_migrations'

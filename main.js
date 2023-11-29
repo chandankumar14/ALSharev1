@@ -13,7 +13,7 @@ const PORT_NO = process.env.PORT_NO;
 const API_URL = process.env.API_URL;
 let HOST_NO = process.env.HOST;
 // ********Knex Initializing here **********
-const knexInstance = knex(knexConfig['development']);
+const knexInstance = knex(knexConfig['production']);
 Model.knex(knexInstance)
 //*******creating express APP here ********** */
 const App = express();

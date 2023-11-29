@@ -33,7 +33,7 @@ const user_singIn_signUp = async (data) => {
             const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
             if (Email_Phone.match(Regex)) {
                 //************Send OTP to email address******* */
-                [err, result1] = await to(SendOtpToEmail(Email_Phone, result));
+                [err, result1] = await to(SendOtpToEmail(Email_Phone, result,deviceId));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
@@ -41,7 +41,7 @@ const user_singIn_signUp = async (data) => {
 
             } else {
                 //***********Send OTP to mobile no  */
-                [err, result1] = await to(SendOtpToMobile(Email_Phone, result));
+                [err, result1] = await to(SendOtpToMobile(Email_Phone, result,deviceId));
                 if (err) {
                     throw ErrorResponse(err.message)
                 }
@@ -55,7 +55,7 @@ const user_singIn_signUp = async (data) => {
             const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
             if (Email_Phone.match(Regex)) {
                 //************Send OTP to email address******* */
-                [err, result1] = await to(SendOtpToEmail(Email_Phone, result));
+                [err, result1] = await to(SendOtpToEmail(Email_Phone, result,deviceId));
                 msg.msg = `OTP has been sent to your Email Address  ${Email_Phone}`
                 if (err) {
                     throw ErrorResponse(err.message)
@@ -64,7 +64,7 @@ const user_singIn_signUp = async (data) => {
 
             } else {
                 //***********Send OTP to mobile no  */
-                [err, result1] = await to(SendOtpToMobile());
+                [err, result1] = await to(SendOtpToMobile( Email_Phone, results,deviceId));
                 msg.msg = `OTP has been sent to your Mobile No  ${Email_Phone}`
                 if (err) {
                     throw ErrorResponse(err.message)
@@ -86,7 +86,7 @@ const user_singIn_signUp = async (data) => {
     }
 }
 
-const SendOtpToEmail = async (Email_Phone, results) => {
+const SendOtpToEmail = async (Email_Phone, results,deviceId) => {
     try {
         let err, result1
         const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -108,7 +108,7 @@ const SendOtpToEmail = async (Email_Phone, results) => {
 }
 
 
-const SendOtpToMobile = async (Email_Phone, results) => {
+const SendOtpToMobile = async (Email_Phone, results,deviceId) => {
     try {
         let err, result1
         const result = await common.SendOtpToMobile(Email_Phone);

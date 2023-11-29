@@ -11,10 +11,10 @@ module.exports = {
             directory: "../db/seeds"
         },
         connection: {
-            host: process.env.DB_HOST, //development.host
-            user: process.env.DB_USER, //development.username
-            password: process.env.DB_PASSWORD, //development.password
-            database: process.env.DB_NAME    //development.database 
+            host: process.env.DB_DEVELOPMENT_HOST, //development.host
+            user: process.env.DB_DEVELOPMENT_USER, //development.username
+            password: process.env.DB_DEVELOPMENT_PASSWORD, //development.password
+            database: process.env.DB_DEVLOPMENT_NAME    //development.database 
         },
         migrations: {
             tableName: 'knex_migrations'

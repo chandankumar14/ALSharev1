@@ -45,7 +45,7 @@ const deleteEventContent = async (contentId) => {
     }
 }
 //*************All event List ******* */
-const eventContentList = async (eventId) => {
+const eventContentList = async (eventId, sort, sortValue) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query()
@@ -57,8 +57,8 @@ const eventContentList = async (eventId) => {
             .where({ "eventId": eventId })
             .where({ "status": 1 })
             .where({ "delete": 0 })
-            .orderBy("rating", "DESC"))
-            
+            .orderBy(sort, sortValue))
+
         if (err) {
             throw ErrorResponse(err.message)
         }

@@ -91,7 +91,7 @@ const userPostedEventContent = async (req, res) => {
 const eventContentList = async (req, res) => {
     let result, err
     let eventId= req.query.eventId;
-    let sort = req.query.sort;
+    let sort = req.query.sort?req.query.sort:'rating';
     let sortValue = req.query.sortValue === 0 ? 'ASC' : 'DESC';
     try {
         [err, result] = await to(eventContentService.eventContentList(eventId,sort,sortValue))

@@ -168,8 +168,7 @@ const expireEventList = async () => {
                         if (err) {
                             throw ErrorResponse(err.message);
                         };
-                        console.log(ressult4)
-                        if (ressult4 && ressult4 != undefined) {
+                       if (ressult4 && ressult4 != undefined) {
                             try {
                                 let result5;
                                 [err, result5] = await to(eventModel.query().update({ event_balance_credit_status: 1 })

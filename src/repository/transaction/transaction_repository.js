@@ -175,7 +175,7 @@ const walletBalance = async (userId) => {
             throw ErrorResponse(err.message)
         }
         if (result && result != undefined) {
-            result[0]["walletBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            result[0]["walletBalance"] = (result[0].Credit_amount - result[0].Debit_amount).toFixed(2);
             return result
         }
     } catch (err) {
@@ -227,7 +227,7 @@ const eventBalance = async (userId) => {
             throw ErrorResponse(err.message)
         }
         if (result && result != undefined) {
-            result[0]["eventBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            result[0]["eventBalance"] = (result[0].Credit_amount - result[0].Debit_amount).toFixed(2);
             return result
         }
     } catch (err) {

@@ -9,19 +9,11 @@ const knexConfig = require("./db/knex");
 const cors = require("cors");
 const { Model } = require('objection');
 const v1 = require("./src/routes/index");
-<<<<<<< HEAD
 const PORT_NO = process.env.DB_PRODUCTION_PORT;
 const API_URL = process.env.API_URL;
 let HOST_NO = process.env.HOST;
 // ********Knex Initializing here **********
 const knexInstance = knex(knexConfig['production']);
-=======
-const PORT_NO = process.env.DB_DEVELOPMENT_PORT;
-const API_URL = process.env.API_URL;
-let HOST_NO = process.env.HOST;
-// ********Knex Initializing here **********
-const knexInstance = knex(knexConfig['staging']);
->>>>>>> development
 Model.knex(knexInstance)
 //*******creating express APP here ********** */
 const App = express();

@@ -55,7 +55,6 @@ const eventPaymentInitiation = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-
 //**************updating payment success or failed result ************/
 const eventPaymentComplection = async (data) => {
     try {
@@ -67,8 +66,8 @@ const eventPaymentComplection = async (data) => {
             transId: data.transId,
             payment_mode: data.payment_mode ? data.payment_mode : null,
             status: 1,
-            for_event:1,
-            event_balance_status:1
+            for_event: 1,
+            event_balance_status: 1
 
         };
         const participantPayload = {
@@ -76,7 +75,7 @@ const eventPaymentComplection = async (data) => {
             eventId: data.eventId,
             joining_date: Today_Date,
             status: 1,
-            event_owner_Id:data.event_owner_Id
+            event_owner_Id: data.event_owner_Id
         };
         [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId }));
         if (err) {
@@ -176,7 +175,7 @@ const walletBalance = async (userId) => {
             throw ErrorResponse(err.message)
         }
         if (result && result != undefined) {
-            result[0]["walletBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            result[0]["walletBalance"] = (result[0].Credit_amount - result[0].Debit_amount).toFixed(2);
             return result
         }
     } catch (err) {
@@ -228,7 +227,7 @@ const eventBalance = async (userId) => {
             throw ErrorResponse(err.message)
         }
         if (result && result != undefined) {
-            result[0]["eventBalance"] = (result[0].Credit_amount - result[0].Debit_amount);
+            result[0]["eventBalance"] = (result[0].Credit_amount - result[0].Debit_amount).toFixed(2);
             return result
         }
     } catch (err) {
@@ -247,7 +246,7 @@ const joinEventFromWallet = async (data) => {
             eventId: data.eventId,
             joining_date: Today_Date,
             status: 1,
-            event_owner_Id:data.event_owner_Id
+            event_owner_Id: data.event_owner_Id
         };
         const transPayload = {
             userId: data.userId,
@@ -259,8 +258,8 @@ const joinEventFromWallet = async (data) => {
             transId: transId,
             status: 1,
             payment_mode: "wallet",
-            for_event:1,
-            event_balance_status:1
+            for_event: 1,
+            event_balance_status: 1
         };
         [err, result] = await to(ALPayModel.query().insert(transPayload));
         if (err) {
@@ -295,7 +294,7 @@ const joinEventFromEventBalance = async (data) => {
             eventId: data.eventId,
             joining_date: Today_Date,
             status: 1,
-            event_owner_Id:data.event_owner_Id
+            event_owner_Id: data.event_owner_Id
         };
         const transPayload = {
             userId: data.userId,
@@ -327,6 +326,82 @@ const joinEventFromEventBalance = async (data) => {
     }
 }
 
+//***********paying for event Prize *********** */
+const eventChargeThroughWallet = async (data) => {
+    try {
+        let err, result;
+        const transId = crypto.randomBytes(16).toString('hex');
+        const orderId = crypto.randomBytes(16).toString('hex');
+        const transPayload = {
+            userId: data.userId,
+            debit_amount: data.amount,
+            orderId: orderId,
+            currency_code: 'INR',
+            initiated: 1,
+            keyId: razorpayKeyId,
+            transId: transId,
+            status: 1,
+            payment_mode: "wallet",
+            for_event: 1,
+            event__prize_charge: data.amount,
+            eventId: data.eventId
+        };
+        [err, result] = await to(ALPayModel.query().insert(transPayload));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+//***********Paying event Charge through event balance ******* */
+const eventChargeThroughEventBalance = async (data) => {
+    try {
+        let err, result;
+        const transId = crypto.randomBytes(16).toString('hex');
+        const orderId = crypto.randomBytes(16).toString('hex');
+        const transPayload = {
+            userId: data.userId,
+            debit_amount: data.amount,
+            orderId: orderId,
+            currency_code: 'INR',
+            transId: transId,
+            status: 1,
+            payment_mode: "event_balance",
+            event__prize_charge: 1,
+            eventId: data.eventId
+        };
+        [err, result] = await to(event_balanceModel.query().insert(transPayload));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+//************Paying the event charge through Razorpay********** */
+const eventChargeThroughOthers = async (data) => {
+    try {
+        let err, result1;
+        let orderId = data.orderId;
+        //***********updating transaction table ********** */
+        const transPayload = {
+            transId: data.transId,
+            payment_mode: data.payment_mode ? data.payment_mode : null,
+            status: 1,
+            event__prize_charge: 1
+        };
+        [err, result1] = await to(transactionModel.query().update(transPayload).where({ "orderId": orderId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result1
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
@@ -337,5 +412,8 @@ module.exports = {
     eventBalanceTransHistory,
     eventBalance,
     joinEventFromWallet,
-    joinEventFromEventBalance
+    joinEventFromEventBalance,
+    eventChargeThroughWallet,
+    eventChargeThroughEventBalance,
+    eventChargeThroughOthers
 }

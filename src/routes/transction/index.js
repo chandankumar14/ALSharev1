@@ -17,5 +17,8 @@ Router.post(`/join_event_from_wallet`, authMiddleware, transactionController.joi
 Router.get(`/event_balance_history/:userId`, authMiddleware, transactionController.eventBalanceTransHistory);
 Router.get(`/event_balance/:userId`, authMiddleware, transactionController.eventBalance);
 Router.post(`/join_event_from_event_balance`, authMiddleware, transactionController.joinEventFromEventBalance)
-
+//***************Event prize charge*******   */
+Router.post(`/event_charge_wallet`, authMiddleware, transactionController.eventChargeThroughWallet);
+Router.post(`/event_charge_event_balance`, authMiddleware, transactionController.eventChargeThroughEventBalance);
+Router.post(`/event_charge_others`, authMiddleware, transactionController.eventChargeThroughOthers)
 module.exports = Router 

@@ -1,5 +1,4 @@
 const eventService = require("../../service/events/event_service")
-
 //********this is for creating new events**********
 const createEvent = async (req, res) => {
     let result, data,err

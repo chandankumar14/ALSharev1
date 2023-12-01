@@ -14,7 +14,7 @@ module.exports = {
             host: process.env.DB_DEVELOPMENT_HOST, //development.host
             user: process.env.DB_DEVELOPMENT_USER, //development.username
             password: process.env.DB_DEVELOPMENT_PASSWORD, //development.password
-            database: process.env.DB_DEVELOPMENT_NAME    //development.database 
+            database: process.env.DB_DEVLOPMENT_NAME    //development.database
         },
         migrations: {
             tableName: 'knex_migrations'

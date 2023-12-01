@@ -70,10 +70,10 @@ const userPostedEventContent = async (userId) => {
 }
 
 
-const eventContentList = async (eventId) => {
+const eventContentList = async (eventId,sort,sortValue) => {
     try {
         let err, result
-        [err, result] = await to(eventContentRepository.eventContentList(eventId))
+        [err, result] = await to(eventContentRepository.eventContentList(eventId,sort,sortValue))
         if (!result && result == undefined) {
             throw ErrorResponse(err.message)
         }

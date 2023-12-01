@@ -90,7 +90,8 @@ const AllPostedeventList = async (data) => {
                         "firstName", "lastName", "middleName", "email", "profileImage")
                     .where({ "status": 1 }))
             .where({ "event_status": 1 })
-            .where("end_date", ">=", Today_Date))
+            .where("end_date", ">=", Today_Date)
+            .orderBy("created_at","DESC"))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -168,8 +169,7 @@ const expireEventList = async () => {
                         if (err) {
                             throw ErrorResponse(err.message);
                         };
-                        console.log(ressult4)
-                        if (ressult4 && ressult4 != undefined) {
+                       if (ressult4 && ressult4 != undefined) {
                             try {
                                 let result5;
                                 [err, result5] = await to(eventModel.query().update({ event_balance_credit_status: 1 })

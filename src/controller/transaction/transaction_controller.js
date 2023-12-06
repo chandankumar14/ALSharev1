@@ -213,7 +213,7 @@ const eventChargeThroughOthers = async (req, res) => {
         }
         return okResponse(res, {
             result
-        }, "your payment is  successfull ..");
+        }, "your  payment is  successfull ..");
     }
     catch (err) {
         throw badRequestError(err.message)

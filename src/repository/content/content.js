@@ -100,7 +100,7 @@ const postedContentList = async (userId,pageNo) => {
             .where({ "contentStatus": 1 })
             .where({ "delete": 0 })
             .limit(pageNo * 10)
-            .orderBy("rating", "DESC")
+            // .orderBy("rating", "DESC")
             .orderBy("created_at", "DESC"))
         if (err) {
             throw ErrorResponse(err.message)

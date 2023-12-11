@@ -198,6 +198,28 @@ const expireEventList = async () => {
     }
 }
 
+const eventDetails = async (eventId) => {
+    try {
+        let err, result;
+        const Today_Date = moment().format();
+        [err, result] = await to(eventModel.query().select("*")
+            .withGraphFetched('[event_owner]')
+            .modifyGraph('event_owner', (builder) =>
+                builder.select("firstName", "lastName", "middleName", "email", "profileImage"))
+            .where({ "event_status": 1 })
+            .where({ "event_status": 1 })
+            .where({ "delete": 0 })
+            .where("end_date", ">=", Today_Date)
+            .where({ "eventId": eventId })
+        )
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 
 module.exports = {
     createEvent,
@@ -206,5 +228,6 @@ module.exports = {
     postedEventListByUserId,
     AllPostedeventList,
     deleteDraftevent,
-    expireEventList
+    expireEventList,
+    eventDetails
 }

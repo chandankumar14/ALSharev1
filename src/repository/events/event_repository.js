@@ -232,6 +232,7 @@ const profitCals = async (data) => {
         const collect_entry_fee = data.Expected_Users * data.entry_fee;
         const min_prize_return_percentage = (data.min_prize / data.entry_fee) * 100;
         const total_min_prize_value = (min_prize_return_percentage / 100) * (data.Expected_Users * data.entry_fee);
+        const total_profit = ((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100);
         [err, result] = await to(profitCalsModel.query().select("*")
             .where({ "Id": Id})
             .where({ "status": 0 }));
@@ -251,7 +252,7 @@ const profitCals = async (data) => {
             return {
                 userId: data.userId,
                 total_entry_fee: collect_entry_fee.toFixed(2),
-                profit: (((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100)).toFixed(2),
+                profit: total_profit.toFixed(2),
                 Expected_Users: data.Expected_Users,
                 entry_fee: data.entry_fee,
                 min_prize: data.min_prize,
@@ -273,7 +274,7 @@ const profitCals = async (data) => {
             return {
                 userId: data.userId,
                 total_entry_fee: collect_entry_fee.toFixed(2),
-                profit: (((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100)).toFixed(2),
+                profit: total_profit.toFixed(2),
                 Expected_Users: data.Expected_Users,
                 entry_fee: data.entry_fee,
                 min_prize: data.min_prize,

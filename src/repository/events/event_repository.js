@@ -1,8 +1,11 @@
 const eventModel = require("../../models/events/event");
 const participantModel = require("../../models/events/participants");
-const eventBalanceModel = require("../../models/wallet_feature/event_balance")
+const eventBalanceModel = require("../../models/wallet_feature/event_balance");
+const profitCalsModel = require("../../models/events/profit_cals");
 const crypto = require('crypto');
-const moment = require("moment")
+const moment = require("moment");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, '../.env') });
 // ********creating event here********
 const createEvent = async (data) => {
     try {
@@ -221,6 +224,70 @@ const eventDetails = async (eventId) => {
     }
 }
 
+const profitCals = async (data) => {
+    try {
+        let err, result,result2, ressult4;
+        let Id = data.Id ? data.Id : 0;
+        const profit_percentage = process.env.RETURN_PROFIT_PERCENTAGE;
+        const collect_entry_fee = data.Expected_Users * data.entry_fee;
+        const min_prize_return_percentage = (data.min_prize / data.entry_fee) * 100;
+        const total_min_prize_value = (min_prize_return_percentage / 100) * (data.Expected_Users * data.entry_fee);
+        const total_profit = ((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100);
+        [err, result] = await to(profitCalsModel.query().select("*")
+            .where({ "Id": Id})
+            .where({ "status": 0 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        };
+       if (result && result != undefined && result.length > 0) {
+           [err, result2] = await to(profitCalsModel.query().update({
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                expected_users: data.Expected_Users
+            })
+                .where({ "Id": Id }));
+            if (err) {
+                throw ErrorResponse(err.message)
+            };
+            return {
+                userId: data.userId,
+                total_entry_fee: collect_entry_fee.toFixed(2),
+                profit: total_profit.toFixed(2),
+                Expected_Users: data.Expected_Users,
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                min_prize_percentage: min_prize_return_percentage.toFixed(2),
+                total_min_prize_value: total_min_prize_value,
+                Id: result[0].Id
+            };
+        } else {
+            const payload = {
+                userId: data.userId,
+                min_prize: data.min_prize,
+                expected_users: data.Expected_Users,
+                entry_fee: data.entry_fee
+            };
+            [err, ressult4] = await to(profitCalsModel.query().insert(payload));
+            if (err) {
+                throw ErrorResponse(err.message)
+            };
+            return {
+                userId: data.userId,
+                total_entry_fee: collect_entry_fee.toFixed(2),
+                profit: total_profit.toFixed(2),
+                Expected_Users: data.Expected_Users,
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                min_prize_percentage: min_prize_return_percentage.toFixed(2),
+                total_min_prize_value: total_min_prize_value,
+                Id:ressult4.id
+            };
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     createEvent,
     postDraftevent,
@@ -229,5 +296,6 @@ module.exports = {
     AllPostedeventList,
     deleteDraftevent,
     expireEventList,
-    eventDetails
+    eventDetails,
+    profitCals
 }

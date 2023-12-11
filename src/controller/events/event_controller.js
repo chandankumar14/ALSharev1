@@ -125,6 +125,24 @@ const eventDetails = async (req, res) => {
     }
 }
 
+const profitCals = async (req, res) => {
+    let result, err;
+    let data = req.body;
+    try {
+        [err, result] = await to(eventService.profitCals(data));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "Expected profit details ..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+
 module.exports = {
     createEvent,
     postDraftevent,
@@ -132,5 +150,6 @@ module.exports = {
     postedEventListByUserId,
     AllPostedeventList,
     deleteDraftevent,
-    eventDetails
+    eventDetails,
+    profitCals
 }

@@ -159,6 +159,23 @@ const eventContentDetails = async (req, res) => {
     }
 }
 
+const eventContentViews = async (req, res) => {
+    let result,err
+    let data  = req.body;
+    try {
+        [err, result] = await to(eventContentService.eventContentViews(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "event content views is saved  ....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 module.exports = {
     postEventContent,
     deleteEventContent,
@@ -168,5 +185,6 @@ module.exports = {
     eventContentList,
     eventContentRating,
     eventContentAction,
-    eventContentDetails
+    eventContentDetails,
+    eventContentViews
 }

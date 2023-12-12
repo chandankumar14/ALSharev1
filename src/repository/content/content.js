@@ -3,6 +3,8 @@ const contentActionModel = require("../../models/content/content_action")
 const contentRatingModel = require("../../models/content/content_rating")
 const followingModel = require("../../models/following/following")
 const favouritesModel  = require("../../models/content/favourites")
+const contentViewsModel = require("../../models/contentViews/content_views")
+const moment = require("moment");
 //**********posting new content ***** */
 const postContent = async (data) => {
     try {
@@ -369,6 +371,52 @@ const contentRating = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
+//********Content views update ********** */
+const contentViews = async (data) => {
+    try {
+        let err, result, result1;
+        const Today_Date = moment().format();
+        [err, result] = await to(contentViewsModel.query().select("*")
+            .where({ "userId": data.userId })
+            .where({ "contentId": data.contentId })
+            .where("view_date", "<", Today_Date));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result != undefined && result.length === 0) {
+            //*****inserting views data ***********
+            try {
+                let result2;
+                const payload = {
+                    userId: data.userId,
+                    contentId: data.contentId,
+                    view_date: Today_Date
+                };
+                [err, result2] = await to(contentViewsModel.query().insert(payload));
+                if (err) {
+                    throw ErrorResponse(err.message)
+                };
+                if (result2 && result2 != undefined) {
+                    [err, result1] = await to(contentModel.query().update({ views: data.views + 1 })
+                        .where({ "contentId": data.contentId }));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result1
+                }
+            } catch (err) {
+                throw ErrorResponse(err.message)
+            }
+
+        } else {
+            return result
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+
 
 module.exports = {
     postContent,
@@ -383,5 +431,5 @@ module.exports = {
     userFavouritesContentList,
     removeFavouritesContent,
     contentDetails,
-   
+    contentViews
 }

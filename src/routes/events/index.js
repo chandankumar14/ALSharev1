@@ -24,6 +24,7 @@ Router.get(`/posted_event_content_list`, authMiddleware, eventContentcontroller.
 Router.post(`/event_content_rating`, authMiddleware, eventContentcontroller.eventContentRating)
 Router.post(`/event_content_action`, authMiddleware, eventContentcontroller.eventContentAction)
 Router.post(`/event_content_details`, authMiddleware, eventContentcontroller.eventContentDetails)
+Router.post(`/event_content_views`, authMiddleware, eventContentcontroller.eventContentViews)
 module.exports = Router
 
 

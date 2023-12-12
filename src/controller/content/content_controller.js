@@ -209,6 +209,23 @@ const contentDetails = async (req, res) => {
         throw badRequestError(err.message)
     }
 }
+
+const contentViews = async (req, res) => {
+    let result, err;
+    let data = req.body;
+    try {
+        [err, result] = await to(contentService.contentViews(data))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "content views is saved successfully....");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 module.exports = {
     postContent,
     postDraftcontent,
@@ -221,5 +238,6 @@ module.exports = {
     markAsFavourites,
     userFavouritesContentList,
     removeFavouritesContent,
-    contentDetails
+    contentDetails,
+    contentViews
 }

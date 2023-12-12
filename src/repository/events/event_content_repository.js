@@ -51,7 +51,7 @@ const eventContentList = async (eventId, sort, sortValue) => {
     try {
         let err, result
         [err, result] = await to(eventContentModel.query()
-            .select("contentId", "originalSourcePath", "thumbnail",
+            .select("contentId", "originalSourcePath", "thumbnail","views",
                 "duration", "rating", "contentStatus","userCount", "created_at")
             .withGraphFetched('[user_details]')
             .modifyGraph("user_details", (builder) =>

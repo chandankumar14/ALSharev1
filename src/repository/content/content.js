@@ -375,15 +375,15 @@ const contentRating = async (data) => {
 const contentViews = async (data) => {
     try {
         let err, result, result1;
-        const Today_Date = moment().format();
+        const Today_Date = moment().format('YY-MM-DD');
         [err, result] = await to(contentViewsModel.query().select("*")
             .where({ "userId": data.userId })
             .where({ "contentId": data.contentId })
-            .where("view_date", "<", Today_Date));
+            .where("view_date", "=", Today_Date));
         if (err) {
             throw ErrorResponse(err.message)
         }
-        if (result && result != undefined && result.length === 0) {
+       if (result && result != undefined && result.length === 0) {
             //*****inserting views data ***********
             try {
                 let result2;

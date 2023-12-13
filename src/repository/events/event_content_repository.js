@@ -292,11 +292,11 @@ const eventContentDetails = async (userId, contentId) => {
 const eventContentViews = async (data) => {
     try {
         let err, result, result1;
-        const Today_Date = moment().format();
+        const Today_Date = moment().format('YY-MM-DD');
         [err, result] = await to(contentViewsModel.query().select("*")
             .where({ "userId": data.userId })
             .where({ "eventContentId": data.eventContentId })
-            .where("view_date", "<", Today_Date));
+            .where("view_date", "=", Today_Date));
         if (err) {
             throw ErrorResponse(err.message)
         }

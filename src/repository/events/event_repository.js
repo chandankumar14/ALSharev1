@@ -203,9 +203,15 @@ const eventDetails = async (eventId) => {
         let err, result;
         const Today_Date = moment().format();
         [err, result] = await to(eventModel.query().select("*")
-            .withGraphFetched('[event_owner]')
+            .withGraphFetched('[event_owner,participant]')
             .modifyGraph('event_owner', (builder) =>
                 builder.select("firstName", "lastName", "middleName", "email", "profileImage"))
+            .modifyGraph("participant", (builder) =>
+                builder.join("users", "users.userId", "participants.userId")
+                    .select("participants.userId", "participants.eventId",
+                        "participants.joining_date", "participants.status",
+                        "firstName", "lastName", "middleName", "email", "profileImage")
+                    .where({ "status": 1 }))
             .where({ "event_status": 1 })
             .where({ "event_status": 1 })
             .where({ "delete": 0 })

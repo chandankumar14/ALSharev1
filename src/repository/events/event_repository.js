@@ -104,7 +104,6 @@ const AllPostedeventList = async (data) => {
     }
 }
 // delete draft event **********
-
 const deleteDraftevent = async (userId, eventId) => {
     try {
         let err, result;
@@ -119,7 +118,6 @@ const deleteDraftevent = async (userId, eventId) => {
         throw ErrorResponse(err.message)
     }
 }
-
 const expireEventList = async () => {
     try {
         let err, result, payload = [];
@@ -200,7 +198,6 @@ const expireEventList = async () => {
         throw ErrorResponse(err.message)
     }
 }
-
 const eventDetails = async (eventId) => {
     try {
         let err, result;
@@ -223,7 +220,6 @@ const eventDetails = async (eventId) => {
         throw ErrorResponse(err.message)
     }
 }
-
 const profitCals = async (data) => {
     try {
         let err, result,result2, ressult4;

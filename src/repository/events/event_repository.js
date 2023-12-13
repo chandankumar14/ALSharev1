@@ -93,6 +93,7 @@ const AllPostedeventList = async (data) => {
                         "firstName", "lastName", "middleName", "email", "profileImage")
                     .where({ "status": 1 }))
             .where({ "event_status": 1 })
+            .where({ "delete": 0 })
             .where("end_date", ">=", Today_Date)
             .orderBy("created_at","DESC"))
         if (err) {

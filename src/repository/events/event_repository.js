@@ -213,7 +213,6 @@ const eventDetails = async (eventId) => {
                         "firstName", "lastName", "middleName", "email", "profileImage")
                     .where({ "status": 1 }))
             .where({ "event_status": 1 })
-            .where({ "event_status": 1 })
             .where({ "delete": 0 })
             .where("end_date", ">=", Today_Date)
             .where({ "eventId": eventId })

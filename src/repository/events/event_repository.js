@@ -2,6 +2,7 @@ const eventModel = require("../../models/events/event");
 const participantModel = require("../../models/events/participants");
 const eventBalanceModel = require("../../models/wallet_feature/event_balance");
 const profitCalsModel = require("../../models/events/profit_cals");
+const eventContentModel = require("../../models/events/event_content");
 const crypto = require('crypto');
 const moment = require("moment");
 const path = require("path");
@@ -19,9 +20,8 @@ const createEvent = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
-
 //*************posting draft event ********* */
-const postDraftevent = async (eventId,userId) => {
+const postDraftevent = async (eventId, userId) => {
     try {
         let err, result
         [err, result] = await to(eventModel.query().update({ "event_status": 1 })
@@ -95,7 +95,7 @@ const AllPostedeventList = async (data) => {
             .where({ "event_status": 1 })
             .where({ "delete": 0 })
             .where("end_date", ">=", Today_Date)
-            .orderBy("created_at","DESC"))
+            .orderBy("created_at", "DESC"))
         if (err) {
             throw ErrorResponse(err.message)
         }
@@ -118,14 +118,14 @@ const deleteDraftevent = async (userId, eventId) => {
     } catch (err) {
         throw ErrorResponse(err.message)
     }
-}
+}// **********this is for cron job to update winning prize to winner ***********
 const expireEventList = async () => {
     try {
-        let err, result, payload = [];
+        let err, result, winner, payload = [], participantPayload = [];
         const Today_Date = moment().format();
         //**********Fetching All expire event List details****** */
         [err, result] = await to(eventModel.query()
-            .select("eventId", "entry_fee")
+            .select("eventId", "prize", "Min_Prize")
             .where("end_date", "<", Today_Date)
             .where({ "event_balance_credit_status": 0 })
             .where({ "event_status": 1 })
@@ -135,35 +135,77 @@ const expireEventList = async () => {
         }
         if (result && result.length > 0) {
             try {
-                let result2, eventIdList = [];
+                let eventIdList = [];
                 result.map(item => {
                     eventIdList.push(item.eventId);
-                })
-                if (eventIdList && eventIdList.length > 0) {
-                    //*********participants list details ********* */
-                    [err, result2] = await to(participantModel.query()
-                        .select("userId", "eventId")
-                        .havingIn("eventId", eventIdList)
-                        .where({ "status": 1 }))
-                };
-                if (err) {
-                    throw ErrorResponse(err.message)
-                };
-                if (result2 && result2.length > 0) {
-                    result2.map(item1 => {
-                        let response = result.filter(item2 => item2.eventId === item1.eventId);
-                        let payObj = {
-                            userId: item1.userId,
-                            orderId: crypto.randomBytes(16).toString('hex'),
-                            transId: crypto.randomBytes(16).toString('hex'),
-                            credit_amount: response[0].entry_fee,
-                            payment_mode: "credit_event_balance",
-                            status: 1,
-                            currency_code: "INR"
-                        };
-                        payload.push(payObj);
+                });
+                // **********this is  manual Awards for winner *************
+                if (result && result.length > 0) {
+                    result.map(async item => {
+                        let prize = JSON.parse(item.prize);
+                        let awards = prize.awards;
+                        if (item && awards.length > 0) {
+                            try {
+                                [err, winner] = await to(eventContentModel.query().select("userId", "eventId")
+                                    .where({ "eventId": item.eventId })
+                                    .orderBy("rating", "DESC")
+                                    .limit(awards.length));
+                                if (err) {
+                                    throw ErrorResponse(err.message);
+                                };
+                                if (winner && winner.length > 0 && winner != undefined) {
+                                    winner.map((item3, index) => {
+                                        let payObj = {
+                                            userId: item3.userId,
+                                            orderId: crypto.randomBytes(16).toString('hex'),
+                                            transId: crypto.randomBytes(16).toString('hex'),
+                                            credit_amount: awards[index].amount,
+                                            payment_mode: "credit_event_balance",
+                                            status: 1,
+                                            currency_code: "INR"
+                                        };
+                                        payload.push(payObj);
+                                    })
+                                };
+                                //***********updating minimum prize update here to participants*********** */
+                                if (winner && winner.length > 0) {
+                                    let winnerId = [];
+                                    winner.map(async(item1 => {
+                                        winnerId.push(item1.userId);
+                                    }))
+                                    if (winnerId && winnerId.length > 0) {
+                                        try {
+                                            let participantId;
+                                            [err, participantId] = await to(participantModel.query().select("userId")
+                                                .where({ "eventId": item.eventId })
+                                                .havingNotIn("userId", winnerId));
+                                            if (participantId && participantId != undefined) {
+                                                participantId.map(item2 => {
+                                                    let payload = {
+                                                        userId: item2.userId,
+                                                        orderId: crypto.randomBytes(16).toString('hex'),
+                                                        transId: crypto.randomBytes(16).toString('hex'),
+                                                        credit_amount: item.Min_Prize,
+                                                        payment_mode: "credit_event_balance",
+                                                        status: 1,
+                                                        currency_code: "INR"
+                                                    }
+                                                    participantPayload.push(payload)
+                                                })
+                                            }
+                                        } catch (err) {
+                                            throw ErrorResponse(err.message);
+                                        }
+                                    }
+                                }
+
+                            } catch (err) {
+                                throw ErrorResponse(err.message);
+                            }
+                        }
                     })
                 };
+                //***********updating winner prize amount here ************** */
                 if (payload && payload.length > 0) {
                     try {
                         let ressult4;
@@ -171,7 +213,7 @@ const expireEventList = async () => {
                         if (err) {
                             throw ErrorResponse(err.message);
                         };
-                       if (ressult4 && ressult4 != undefined) {
+                        if (ressult4 && ressult4 != undefined) {
                             try {
                                 let result5;
                                 [err, result5] = await to(eventModel.query().update({ event_balance_credit_status: 1 })
@@ -188,17 +230,29 @@ const expireEventList = async () => {
                     } catch (err) {
                         throw ErrorResponse(err.message)
                     }
-                }
-
+                };
+                //***********updating rest participants  prize amount here ************** */
+                if (payload && payload.length > 0) {
+                    try {
+                        let ressult4;
+                        [err, ressult4] = await to(eventBalanceModel.query().insertGraph(participantPayload));
+                        if (err) {
+                            throw ErrorResponse(err.message);
+                        };
+                        return ressult4
+                    } catch (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                };
             } catch (err) {
                 throw ErrorResponse(err.message)
             }
-
         }
     } catch (err) {
         throw ErrorResponse(err.message)
     }
 }
+// *****this is for event details ************
 const eventDetails = async (eventId) => {
     try {
         let err, result;
@@ -226,9 +280,10 @@ const eventDetails = async (eventId) => {
         throw ErrorResponse(err.message)
     }
 }
+//*************profit calculator API ************* */
 const profitCals = async (data) => {
     try {
-        let err, result,result2, ressult4;
+        let err, result, result2, ressult4;
         let Id = data.Id ? data.Id : 0;
         const profit_percentage = process.env.RETURN_PROFIT_PERCENTAGE;
         const collect_entry_fee = data.Expected_Users * data.entry_fee;
@@ -236,13 +291,13 @@ const profitCals = async (data) => {
         const total_min_prize_value = (min_prize_return_percentage / 100) * (data.Expected_Users * data.entry_fee);
         const total_profit = ((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100);
         [err, result] = await to(profitCalsModel.query().select("*")
-            .where({ "Id": Id})
+            .where({ "Id": Id })
             .where({ "status": 0 }));
         if (err) {
             throw ErrorResponse(err.message)
         };
-       if (result && result != undefined && result.length > 0) {
-           [err, result2] = await to(profitCalsModel.query().update({
+        if (result && result != undefined && result.length > 0) {
+            [err, result2] = await to(profitCalsModel.query().update({
                 entry_fee: data.entry_fee,
                 min_prize: data.min_prize,
                 expected_users: data.Expected_Users
@@ -282,7 +337,7 @@ const profitCals = async (data) => {
                 min_prize: data.min_prize,
                 min_prize_percentage: min_prize_return_percentage.toFixed(2),
                 total_min_prize_value: total_min_prize_value.toFixed(2),
-                Id:ressult4.id
+                Id: ressult4.id
             };
         }
     } catch (err) {

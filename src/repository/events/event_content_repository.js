@@ -315,7 +315,7 @@ const eventContentViews = async (data) => {
                 };
                 if (result2 && result2 != undefined) {
                     [err, result1] = await to(eventContentModel.query().update({ views: data.views + 1 })
-                        .where({ "contentId": data.contentId }));
+                        .where({ "contentId": data.eventContentId }));
                     if (err) {
                         throw ErrorResponse(err.message)
                     }

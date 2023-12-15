@@ -129,6 +129,7 @@ const expireEventList = async () => {
             .where("end_date", "<", Today_Date)
             .where({ "event_balance_credit_status": 0 })
             .where({ "event_status": 1 })
+            .where({ "event_type": 1 })
             .where({ "delete": 0 }));
         if (err) {
             throw ErrorResponse(err.message)
@@ -232,7 +233,7 @@ const expireEventList = async () => {
                     }
                 };
                 //***********updating rest participants  prize amount here ************** */
-                if (payload && payload.length > 0) {
+                if (participantPayload && participantPayload.length > 0) {
                     try {
                         let ressult4;
                         [err, ressult4] = await to(eventBalanceModel.query().insertGraph(participantPayload));

@@ -220,6 +220,23 @@ const eventChargeThroughOthers = async (req, res) => {
     }
 }
 
+const joinFreeEvent = async (req, res) => {
+    let err, result;
+    let data = req.body;
+    try {
+        [err, result] = await to(transactionService.joinFreeEvent(data));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "successfull joined event ..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
 
 module.exports ={
     eventPaymentInitiation ,
@@ -234,5 +251,6 @@ module.exports ={
     joinEventFromEventBalance,
     eventChargeThroughWallet,
     eventChargeThroughEventBalance,
-    eventChargeThroughOthers
+    eventChargeThroughOthers,
+    joinFreeEvent
 }

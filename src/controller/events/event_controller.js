@@ -107,11 +107,49 @@ const deleteDraftevent = async (req, res) => {
     }
 }
 
+
+const eventDetails = async (req, res) => {
+    let result, err;
+    let eventId = req.query.eventId
+    try {
+        [err, result] = await to(eventService.eventDetails(eventId));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "event Details fetch  successfully..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+const profitCals = async (req, res) => {
+    let result, err;
+    let data = req.body;
+    try {
+        [err, result] = await to(eventService.profitCals(data));
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, "Expected profit details ..");
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+
+
 module.exports = {
     createEvent,
     postDraftevent,
     draftEventListByUserId,
     postedEventListByUserId,
     AllPostedeventList,
-    deleteDraftevent
+    deleteDraftevent,
+    eventDetails,
+    profitCals
 }

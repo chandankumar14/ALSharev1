@@ -183,6 +183,20 @@ const eventChargeThroughOthers = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
+
+const joinFreeEvent = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(transactionRepository.joinFreeEvent(data));
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports ={
     eventPaymentInitiation,
     eventPaymentComplection ,
@@ -196,5 +210,6 @@ module.exports ={
     joinEventFromEventBalance,
     eventChargeThroughWallet,
     eventChargeThroughEventBalance,
-    eventChargeThroughOthers
+    eventChargeThroughOthers,
+    joinFreeEvent
 }

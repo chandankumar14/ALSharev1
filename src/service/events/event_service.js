@@ -85,11 +85,42 @@ const deleteDraftevent = async (userId, eventId) => {
     }
 }
 
+const eventDetails = async (eventId) => {
+    try {
+        let err, result
+        [err, result] = await to(eventRepository.eventDetails(eventId))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
+
+const profitCals = async (data) => {
+    try {
+        let err, result
+        [err, result] = await to(eventRepository.profitCals(data))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    }
+    catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     createEvent,
     postDraftevent,
     draftEventListByUserId,
     postedEventListByUserId,
     AllPostedeventList,
-    deleteDraftevent
+    deleteDraftevent,
+    eventDetails,
+    profitCals
 }

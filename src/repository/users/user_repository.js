@@ -229,7 +229,8 @@ const userParticipantsEventList = async (userId) => {
                 builder.select("*").where({ "delete": 0 }))
             .modifyGraph("event_owner_details", (builder) =>
                 builder.select("userId", "firstName", "profileImage"))
-            .where({ "userId": userId }))
+            .where({ "userId": userId })
+            .where({"status":1}))
         if (err) {
             throw ErrorResponse(err.message)
         }

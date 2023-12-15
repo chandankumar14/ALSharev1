@@ -1,8 +1,11 @@
 const eventModel = require("../../models/events/event");
 const participantModel = require("../../models/events/participants");
-const eventBalanceModel = require("../../models/wallet_feature/event_balance")
+const eventBalanceModel = require("../../models/wallet_feature/event_balance");
+const profitCalsModel = require("../../models/events/profit_cals");
 const crypto = require('crypto');
-const moment = require("moment")
+const moment = require("moment");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, '../.env') });
 // ********creating event here********
 const createEvent = async (data) => {
     try {
@@ -90,6 +93,7 @@ const AllPostedeventList = async (data) => {
                         "firstName", "lastName", "middleName", "email", "profileImage")
                     .where({ "status": 1 }))
             .where({ "event_status": 1 })
+            .where({ "delete": 0 })
             .where("end_date", ">=", Today_Date)
             .orderBy("created_at","DESC"))
         if (err) {
@@ -101,7 +105,6 @@ const AllPostedeventList = async (data) => {
     }
 }
 // delete draft event **********
-
 const deleteDraftevent = async (userId, eventId) => {
     try {
         let err, result;
@@ -116,7 +119,6 @@ const deleteDraftevent = async (userId, eventId) => {
         throw ErrorResponse(err.message)
     }
 }
-
 const expireEventList = async () => {
     try {
         let err, result, payload = [];
@@ -197,7 +199,96 @@ const expireEventList = async () => {
         throw ErrorResponse(err.message)
     }
 }
-
+const eventDetails = async (eventId) => {
+    try {
+        let err, result;
+        const Today_Date = moment().format();
+        [err, result] = await to(eventModel.query().select("*")
+            .withGraphFetched('[event_owner,participant]')
+            .modifyGraph('event_owner', (builder) =>
+                builder.select("firstName", "lastName", "middleName", "email", "profileImage"))
+            .modifyGraph("participant", (builder) =>
+                builder.join("users", "users.userId", "participants.userId")
+                    .select("participants.userId", "participants.eventId",
+                        "participants.joining_date", "participants.status",
+                        "firstName", "lastName", "middleName", "email", "profileImage")
+                    .where({ "status": 1 }))
+            .where({ "event_status": 1 })
+            .where({ "delete": 0 })
+            .where("end_date", ">=", Today_Date)
+            .where({ "eventId": eventId })
+        )
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+const profitCals = async (data) => {
+    try {
+        let err, result,result2, ressult4;
+        let Id = data.Id ? data.Id : 0;
+        const profit_percentage = process.env.RETURN_PROFIT_PERCENTAGE;
+        const collect_entry_fee = data.Expected_Users * data.entry_fee;
+        const min_prize_return_percentage = (data.min_prize / data.entry_fee) * 100;
+        const total_min_prize_value = (min_prize_return_percentage / 100) * (data.Expected_Users * data.entry_fee);
+        const total_profit = ((collect_entry_fee) - (total_min_prize_value)) * (profit_percentage / 100);
+        [err, result] = await to(profitCalsModel.query().select("*")
+            .where({ "Id": Id})
+            .where({ "status": 0 }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        };
+       if (result && result != undefined && result.length > 0) {
+           [err, result2] = await to(profitCalsModel.query().update({
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                expected_users: data.Expected_Users
+            })
+                .where({ "Id": Id }));
+            if (err) {
+                throw ErrorResponse(err.message)
+            };
+            return {
+                userId: data.userId,
+                total_entry_fee: collect_entry_fee.toFixed(2),
+                profit: total_profit.toFixed(2),
+                Expected_Users: data.Expected_Users,
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                min_prize_percentage: min_prize_return_percentage.toFixed(2),
+                total_min_prize_value: total_min_prize_value.toFixed(2),
+                Id: result[0].Id
+            };
+        } else {
+            const payload = {
+                userId: data.userId,
+                min_prize: data.min_prize,
+                expected_users: data.Expected_Users,
+                entry_fee: data.entry_fee
+            };
+            [err, ressult4] = await to(profitCalsModel.query().insert(payload));
+            if (err) {
+                throw ErrorResponse(err.message)
+            };
+            return {
+                userId: data.userId,
+                total_entry_fee: collect_entry_fee.toFixed(2),
+                profit: total_profit.toFixed(2),
+                Expected_Users: data.Expected_Users,
+                entry_fee: data.entry_fee,
+                min_prize: data.min_prize,
+                min_prize_percentage: min_prize_return_percentage.toFixed(2),
+                total_min_prize_value: total_min_prize_value.toFixed(2),
+                Id:ressult4.id
+            };
+        }
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 
 module.exports = {
     createEvent,
@@ -206,5 +297,7 @@ module.exports = {
     postedEventListByUserId,
     AllPostedeventList,
     deleteDraftevent,
-    expireEventList
+    expireEventList,
+    eventDetails,
+    profitCals
 }

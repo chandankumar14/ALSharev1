@@ -399,6 +399,27 @@ const eventChargeThroughOthers = async (data) => {
         throw ErrorResponse(err.message)
     }
 }
+//******************join free event here *********** */
+const joinFreeEvent = async (data) => {
+    try {
+        let err, result;
+        const Today_Date = moment().format();
+        const participantPayload = {
+            userId: data.userId,
+            eventId: data.eventId,
+            joining_date: Today_Date,
+            status: 1,
+            event_owner_Id: data.event_owner_Id
+        };
+        [err, result] = await to(participants.query().insert(participantPayload));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports = {
     eventPaymentInitiation,
     eventPaymentComplection,
@@ -412,5 +433,6 @@ module.exports = {
     joinEventFromEventBalance,
     eventChargeThroughWallet,
     eventChargeThroughEventBalance,
-    eventChargeThroughOthers
+    eventChargeThroughOthers,
+    joinFreeEvent
 }

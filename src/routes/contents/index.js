@@ -16,4 +16,5 @@ Router.post(`/mark_favourites`, authMiddleware, contentController.markAsFavourit
 Router.get(`/favourites_content_list/:userId`, authMiddleware, contentController.userFavouritesContentList)
 Router.put(`/delete_favourites_content`, authMiddleware, contentController.removeFavouritesContent)
 Router.post(`/content_details`, authMiddleware, contentController.contentDetails)
+Router.post(`/content_views`,authMiddleware,contentController.contentViews)
 module.exports = Router

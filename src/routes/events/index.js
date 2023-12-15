@@ -12,6 +12,8 @@ Router.get(`/posted_event_list_by_userId/:userId`, authMiddleware, eventControll
 Router.get(`/draft_event_list_by_userId/:userId`, authMiddleware, eventController.draftEventListByUserId)
 Router.get(`/all_posted_event_list`,authMiddleware, eventController.AllPostedeventList)
 Router.delete(`/delete_draft_event`, authMiddleware, eventController.deleteDraftevent)
+Router.get(`/event_details`, authMiddleware, eventController.eventDetails)
+Router.post(`/profit_cals`, authMiddleware, eventController.profitCals)
 //*********event content Routing here********** */
 Router.post(`/post_event_content`, authMiddleware, eventContentcontroller.postEventContent)
 Router.get(`/delete_event_content/:contentId`, authMiddleware, eventContentcontroller.deleteEventContent)
@@ -22,6 +24,7 @@ Router.get(`/posted_event_content_list`, authMiddleware, eventContentcontroller.
 Router.post(`/event_content_rating`, authMiddleware, eventContentcontroller.eventContentRating)
 Router.post(`/event_content_action`, authMiddleware, eventContentcontroller.eventContentAction)
 Router.post(`/event_content_details`, authMiddleware, eventContentcontroller.eventContentDetails)
+Router.post(`/event_content_views`, authMiddleware, eventContentcontroller.eventContentViews)
 module.exports = Router
 
 

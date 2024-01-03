@@ -414,8 +414,8 @@ const joinFreeEvent = async (data) => {
         [err, result] = await to(participants.query().insert(participantPayload));
         if (err) {
             throw ErrorResponse(err.message)
-        }
-        return result
+        };
+        return result;
     } catch (err) {
         throw ErrorResponse(err.message)
     }

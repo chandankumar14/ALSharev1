@@ -21,5 +21,5 @@ Router.post(`/join_event_from_event_balance`, authMiddleware, transactionControl
 Router.post(`/event_charge_wallet`, authMiddleware, transactionController.eventChargeThroughWallet);
 Router.post(`/event_charge_event_balance`, authMiddleware, transactionController.eventChargeThroughEventBalance);
 Router.post(`/event_charge_others`, authMiddleware, transactionController.eventChargeThroughOthers);
-Router.post(`/join_free_event`,authMiddleware,transactionController.joinFreeEvent)
+Router.post(`/join_free_event`,authMiddleware,transactionController.joinFreeEvent);
 module.exports = Router 

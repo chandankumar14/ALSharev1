@@ -252,11 +252,37 @@ const userParticipantsEventList = async (userId) => {
         throw ErrorResponse(err.message)
     }
 }
+const accountDeletion = async (Email_Phone) => {
+    try {
+        console.log(Email_Phone)
+        let message = `your request is accepted to delete account it could take 2-3 business days to proceed the request.`
+        let err, result
+        [err, result] = await to(userModel.query().select("*")
+            .orWhere({
+                "email": Email_Phone
+            })
+            .orWhere({ "phone": Email_Phone })
+        );
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        if (result && result.length > 0) {
+            const result1 = await common.accountDeletion(result);
+            return message
+        }else{
+            return `user does not exist ..`
+        }
+       
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
 
+}
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
     user_details,
-    userParticipantsEventList
+    userParticipantsEventList,
+    accountDeletion
 }

@@ -64,10 +64,24 @@ const userParticipantsEventList = async (userId) => {
     }
 }
 
+const accountDeletion = async (Email_Phone) => {
+    let err, result
+    try {
+        [err, result] = await to(userRepository.accountDeletion(Email_Phone))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
     user_details,
-    userParticipantsEventList
+    userParticipantsEventList,
+    accountDeletion
 }

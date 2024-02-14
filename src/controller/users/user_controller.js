@@ -96,11 +96,28 @@ const userParticipantsEventList = async (req, res) => {
         throw badRequestError(err.message)
     }
 }
+const accountDeletion = async (req, res) => {
+    let result, err;
+    let Email_Phone = req.query.Email_Phone;
+   try {
+        [err, result] = await to(userService.accountDeletion(Email_Phone))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        });
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
 
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
     user_details,
-    userParticipantsEventList
+    userParticipantsEventList,
+    accountDeletion
 }

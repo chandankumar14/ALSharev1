@@ -124,11 +124,44 @@ const storage = multer.diskStorage({
 })
 const upload_profile_image = multer({ storage: storage })
 
+
+async function accountDeletion(result) {
+  const transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE_NAME,
+    auth: {
+      user: process.env.EMAIL_USER_NAME,
+      pass: process.env.EMAIL_USER_PASS
+    }
+  });
+  const mailOptions = {
+    from: 'chandan.kumar@acelucid.com',
+    to: "devopsdevops40@gmail.com",
+    subject: 'Account Deletion Request',
+    html: `<div style="font-family:emoji; font-size=20px; min-width:1000px;overflow:auto;line-height:2">
+            <div style="margin:50px auto;width:70%;padding:20px 0">
+            <div style="border-bottom:1px solid #eee">
+            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">ALShare</a>
+            </div>
+            <p style="font-size:1.1em">Hi, ${result[0].firstName}</p>
+            <p style="font-family:emoji;font-size=25px;">${result[0].firstName} is requesting to delete the account..</p>
+            <p style="font-size:16px;font-family:emoji">Regards,<br />ALShare</p>
+            <hr style="border:none;border-top:1px solid #eee" />
+            </div>
+            </div>`
+  };
+  const Result = await transporter.sendMail(mailOptions)
+  if (Result && Result != undefined) {
+    return {
+      Result: Result
+    }
+  }
+}
 module.exports = {
   EncryptPassword,
   DecryptPassowrd,
   SendOtpToMobile,
   SendOtpToEmail,
   generateUsername,
-  upload_profile_image
+  upload_profile_image,
+  accountDeletion
 }

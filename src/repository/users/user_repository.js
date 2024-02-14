@@ -19,60 +19,8 @@ const user_singIn_signUp = async (data) => {
         if (err) {
             throw ErrorResponse(err.message)
         }
-        //*****************if user doesn't exist *********** */
-        if (result.length === 0) {
-            [err, result1] = await to(sendOTP(Email_Phone, deviceId))
-            if (err) {
-                throw ErrorResponse(err.message)
-            }
-            return result1
-        }
-        // ********If OTP verification is not completed **************
-        else if (result[0].OTP_Verification === 0) {
-            let err, result1
-            const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
-            if (Email_Phone.match(Regex)) {
-                //************Send OTP to email address******* */
-                [err, result1] = await to(SendOtpToEmail(Email_Phone, result,deviceId));
-                if (err) {
-                    throw ErrorResponse(err.message)
-                }
-                return result
-
-            } else {
-                //***********Send OTP to mobile no  */
-                [err, result1] = await to(SendOtpToMobile(Email_Phone, result,deviceId));
-                if (err) {
-                    throw ErrorResponse(err.message)
-                }
-                return result
-            }
-
-        }
-        //*******If user is using different device******* */
-        else if (result.length > 0 && result[0].OTP_Verification === 1 && result[0].deviceId != deviceId) {
-            let err, result1
-            const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
-            if (Email_Phone.match(Regex)) {
-                //************Send OTP to email address******* */
-                [err, result1] = await to(SendOtpToEmail(Email_Phone, result,deviceId));
-                msg.msg = `OTP has been sent to your Email Address  ${Email_Phone}`
-                if (err) {
-                    throw ErrorResponse(err.message)
-                }
-                return result
-
-            } else {
-                //***********Send OTP to mobile no  */
-                [err, result1] = await to(SendOtpToMobile( Email_Phone, results,deviceId));
-                msg.msg = `OTP has been sent to your Mobile No  ${Email_Phone}`
-                if (err) {
-                    throw ErrorResponse(err.message)
-                }
-                return result
-            }
-        }
-        else {
+        //**********this is for google console validation****** */
+        if (Email_Phone == "chandan.kumar@acelucid.com" && result.length > 0) {
             msg.msg = `You are loggedIn successfully`
             const payload = {
                 userId: result[0].userId
@@ -81,12 +29,77 @@ const user_singIn_signUp = async (data) => {
             result[0]["token"] = `${token}`
             return result
         }
+        // ******ending google console login bypass *********
+        else {
+            //*****************if user doesn't exist *********** */
+            if (result.length === 0) {
+                [err, result1] = await to(sendOTP(Email_Phone, deviceId))
+                if (err) {
+                    throw ErrorResponse(err.message)
+                }
+                return result1
+            }
+            // ********If OTP verification is not completed **************
+            else if (result[0].OTP_Verification === 0) {
+                let err, result1
+                const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+                if (Email_Phone.match(Regex)) {
+                    //************Send OTP to email address******* */
+                    [err, result1] = await to(SendOtpToEmail(Email_Phone, result, deviceId));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result
+
+                } else {
+                    //***********Send OTP to mobile no  */
+                    [err, result1] = await to(SendOtpToMobile(Email_Phone, result, deviceId));
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result
+                }
+
+            }
+            //*******If user is using different device******* */
+            else if (result.length > 0 && result[0].OTP_Verification === 1 && result[0].deviceId != deviceId) {
+                let err, result1
+                const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+                if (Email_Phone.match(Regex)) {
+                    //************Send OTP to email address******* */
+                    [err, result1] = await to(SendOtpToEmail(Email_Phone, result, deviceId));
+                    msg.msg = `OTP has been sent to your Email Address  ${Email_Phone}`
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result
+
+                } else {
+                    //***********Send OTP to mobile no  */
+                    [err, result1] = await to(SendOtpToMobile(Email_Phone, results, deviceId));
+                    msg.msg = `OTP has been sent to your Mobile No  ${Email_Phone}`
+                    if (err) {
+                        throw ErrorResponse(err.message)
+                    }
+                    return result
+                }
+            }
+            else {
+                msg.msg = `You are loggedIn successfully`
+                const payload = {
+                    userId: result[0].userId
+                }
+                const token = jwt.sign(payload, secretOrKey);
+                result[0]["token"] = `${token}`
+                return result
+            }
+        }
     } catch (err) {
         throw ErrorResponse(err.message)
     }
 }
 
-const SendOtpToEmail = async (Email_Phone, results,deviceId) => {
+const SendOtpToEmail = async (Email_Phone, results, deviceId) => {
     try {
         let err, result1
         const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -108,7 +121,7 @@ const SendOtpToEmail = async (Email_Phone, results,deviceId) => {
 }
 
 
-const SendOtpToMobile = async (Email_Phone, results,deviceId) => {
+const SendOtpToMobile = async (Email_Phone, results, deviceId) => {
     try {
         let err, result1
         const result = await common.SendOtpToMobile(Email_Phone);
@@ -230,7 +243,7 @@ const userParticipantsEventList = async (userId) => {
             .modifyGraph("event_owner_details", (builder) =>
                 builder.select("userId", "firstName", "profileImage"))
             .where({ "userId": userId })
-            .where({"status":1}))
+            .where({ "status": 1 }))
         if (err) {
             throw ErrorResponse(err.message)
         }

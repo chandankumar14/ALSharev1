@@ -12,6 +12,7 @@ Router.put(`/edit_user_profile`, authMiddleware, common.upload_profile_image.sin
 Router.get(`/user_details/:userId`,authMiddleware,userController.user_details)
 Router.get(`/user_join_event_list`,authMiddleware,userController.userParticipantsEventList)
 Router.get(`/delete_account`,userController.accountDeletion)
+Router.get(`/account_deletion_verify`,userController.accountDeletionVerification)
 module.exports = Router
 
 

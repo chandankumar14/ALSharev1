@@ -77,11 +77,24 @@ const accountDeletion = async (Email_Phone) => {
     }
 }
 
+const accountDeletionVerification = async (OTP_code) => {
+    let err, result
+    try {
+        [err, result] = await to(userRepository.accountDeletionVerification(OTP_code))
+        if (!result && result == undefined) {
+            throw ErrorResponse(err.message)
+        }
+        return result
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
     user_details,
     userParticipantsEventList,
-    accountDeletion
+    accountDeletion,
+    accountDeletionVerification
 }

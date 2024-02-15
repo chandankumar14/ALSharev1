@@ -254,10 +254,8 @@ const userParticipantsEventList = async (userId) => {
 }
 const accountDeletion = async (Email_Phone) => {
     try {
-        console.log(Email_Phone)
-        let message = `your request is accepted to delete account it could take 2-3 business days to proceed the request.`
-        let err, result
-        [err, result] = await to(userModel.query().select("*")
+        let err, result, result2;
+        [err, result] = await to(userModel.query().select("userId", "firstName")
             .orWhere({
                 "email": Email_Phone
             })
@@ -267,22 +265,56 @@ const accountDeletion = async (Email_Phone) => {
             throw ErrorResponse(err.message)
         }
         if (result && result.length > 0) {
-            const result1 = await common.accountDeletion(result);
-            return message
-        }else{
+            const Regex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+            if (Email_Phone.match(Regex)) {
+                const result1 = await common.accountDeletion(Email_Phone, result);
+                [err, result2] = await to(userModel.query().update({ OTP: result1.OTP })
+                    .where({ "userId": result[0].userId }))
+                msg.msg = `OTP has been sent to your Email Address  ${Email_Phone}`
+                return result
+            } else {
+                const result3 = await common.deletionOtpToMobile(Email_Phone);
+                [err, result2] = await to(userModel.query().update({ OTP: result3.encrypt_pass })
+                    .where({ "userId": result[0].userId }))
+                msg.msg = `OTP has been sent to your mobile no   ${Email_Phone}`
+                return result
+            }
+        } else {
             return `user does not exist ..`
         }
-       
+
     } catch (err) {
         throw ErrorResponse(err.message)
     }
 
 }
+
+const accountDeletionVerification = async(OTP_code)=>{
+    try {
+        let err, result, result1
+        const OTP = await common.EncryptPassword(OTP_code);
+       [err, result] = await to(userModel.query().select("userId","firstName","OTP").where({ "OTP": OTP }));
+        msg.msg = `your account is deleted successfully `
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        [err, result1] = await to(userModel.query().delete().where({ "userId": result[0].userId }));
+        if (err) {
+            throw ErrorResponse(err.message)
+        }
+        return result1
+
+    } catch (err) {
+        throw ErrorResponse(err.message)
+    }
+}
+
 module.exports = {
     user_singIn_signUp,
     OTPVerification,
     editUserProfile,
     user_details,
     userParticipantsEventList,
-    accountDeletion
+    accountDeletion,
+    accountDeletionVerification
 }

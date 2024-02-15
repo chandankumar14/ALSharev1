@@ -106,7 +106,23 @@ const accountDeletion = async (req, res) => {
         }
         return okResponse(res, {
             result
-        });
+        }, msg.msg);
+    }
+    catch (err) {
+        throw badRequestError(err.message)
+    }
+}
+const accountDeletionVerification = async (req, res) => {
+    let result, err;
+    let OTP_code = req.query.OTP_code;
+   try {
+        [err, result] = await to(userService.accountDeletionVerification(OTP_code))
+        if (err) {
+            throw badRequestError(err.message)
+        }
+        return okResponse(res, {
+            result
+        }, msg.msg);
     }
     catch (err) {
         throw badRequestError(err.message)
@@ -119,5 +135,6 @@ module.exports = {
     editUserProfile,
     user_details,
     userParticipantsEventList,
-    accountDeletion
+    accountDeletion,
+    accountDeletionVerification
 }

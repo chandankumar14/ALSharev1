@@ -22,7 +22,7 @@ function generateUsername() {
   for (let i = 0; i < 3; i++) {
     TwoDigit += digits[Math.floor(Math.random() * 10)];
   }
-  const User_Name  = "user".concat(TwoDigit)
+  const User_Name = "user".concat(TwoDigit)
   return User_Name;
 }
 // ************ password Encryption using node crypto module*********** 
@@ -41,7 +41,7 @@ async function EncryptPassword(pass) {
 }
 
 // *************** Password Decryption using node crypto module************
- async function DecryptPassowrd(encrypt_pass) {
+async function DecryptPassowrd(encrypt_pass) {
   const secret_vector = process.env.SECRET_VECTOR;
   const secret_vector_init_key = process.env.SECRET_VECTOR_INIT_KEY;
   const secret_init_key = process.env.SECRET_INIT_KEY;
@@ -77,7 +77,7 @@ async function SendOtpToMobile(phone_number) {
 async function SendOtpToEmail(Email) {
   const OTP = generateOTP()
   const Email_Address = Email;
-  const encrypt_pass  = await EncryptPassword(OTP) 
+  const encrypt_pass = await EncryptPassword(OTP)
   const User_Name = Email_Address.split("@")[0]
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE_NAME,
@@ -125,7 +125,9 @@ const storage = multer.diskStorage({
 const upload_profile_image = multer({ storage: storage })
 
 
-async function accountDeletion(result) {
+async function accountDeletion(Email_Phone, result) {
+  const OTP = generateOTP()
+  const encrypt_pass = await EncryptPassword(OTP)
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE_NAME,
     auth: {
@@ -135,7 +137,7 @@ async function accountDeletion(result) {
   });
   const mailOptions = {
     from: 'chandan.kumar@acelucid.com',
-    to: "devopsdevops40@gmail.com",
+    to: Email_Phone,
     subject: 'Account Deletion Request',
     html: `<div style="font-family:emoji; font-size=20px; min-width:1000px;overflow:auto;line-height:2">
             <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -143,7 +145,7 @@ async function accountDeletion(result) {
             <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">ALShare</a>
             </div>
             <p style="font-size:1.1em">Hi, ${result[0].firstName}</p>
-            <p style="font-family:emoji;font-size=25px;">${result[0].firstName} is requesting to delete the account..</p>
+            <p style="font-family:emoji;font-size=25px;"> please use OTP ${OTP} to complete the account deleteion process..</p>
             <p style="font-size:16px;font-family:emoji">Regards,<br />ALShare</p>
             <hr style="border:none;border-top:1px solid #eee" />
             </div>
@@ -152,7 +154,26 @@ async function accountDeletion(result) {
   const Result = await transporter.sendMail(mailOptions)
   if (Result && Result != undefined) {
     return {
-      Result: Result
+      Result: Result,
+      OTP: encrypt_pass,
+    }
+  }
+}
+
+async function deletionOtpToMobile(phone_number) {
+  const route = process.env.ROUTE
+  const variables_values = generateOTP()
+  const encrypt_pass = await EncryptPassword(variables_values)
+  const numbers = phone_number
+  const flash = "0"
+  const fast2sms_base_url = process.env.FAST_2_SMS_URL
+  const authorization = process.env.AUTHORIZATION_KEY
+  const Url = `${fast2sms_base_url}?authorization=${authorization}&route=${route}&variables_values=${variables_values}&flash=${flash}&numbers=${numbers}`
+  const response = await axios.get(Url)
+  if (response && response != undefined && encrypt_pass && encrypt_pass != undefined) {
+    return {
+      response: response.data.return,
+      encrypt_pass: encrypt_pass
     }
   }
 }
@@ -163,5 +184,6 @@ module.exports = {
   SendOtpToEmail,
   generateUsername,
   upload_profile_image,
-  accountDeletion
+  accountDeletion,
+  deletionOtpToMobile
 }
